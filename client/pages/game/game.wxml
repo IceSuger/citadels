@@ -1,2 +1,13 @@
 <!--pages/game/game.wxml-->
-<text>pages/game/game.wxml</text>
+<template name="player">
+	<view class="zan-badge demo__icon">
+		<image src="{{avatarUrl}}" class='demo__icon'></image>
+		<view class="zan-badge__count">{{handCnt}}</view>
+	</view>
+	<text>{{role.name_zh}}</text>
+	<view>{{buildingCardList}}</view>
+</template>
+
+<template is="player"></template>
+<template is="player" data="{{...item}}"></template>
+<template is="player"></template>

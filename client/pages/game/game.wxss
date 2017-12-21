@@ -1,1 +1,15 @@
 /* pages/game/game.wxss */
+.demo {
+  padding: 40px 0;
+  display: flex;
+}
+.demo__item {
+  flex: 1;
+}
+.demo__icon {
+  margin: 0 auto;
+  width: 48rpx;
+  height: 48rpx;
+  background: #ddd;
+  border-radius: 4px;
+}

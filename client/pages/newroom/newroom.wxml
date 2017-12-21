@@ -3,7 +3,6 @@
 <import src="/zanui/toptips/index.wxml" />
 <import src="/zanui/stepper/index.wxml" />
 
-<text>pages/newroom/newroom.wxml</text>
 <!-- 使用 Field 圆角样式 -->
 <view class="zan-panel-title field__title--radius">房间人数</view>
 <view style="padding: 40px 15px">

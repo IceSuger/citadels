@@ -75,6 +75,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
     },
 	//进入房间
     enterRoom: function () {
+		// wx.getSystemInfo({
+		// 	success: function(res) {
+		// 		console.log(res);
+		// 		if(res.SDKVersion >= "1.7.0")
+		// 		{
+		// 			console.log("greater than 1.7.0");
+		// 		}
+		// 		else{
+		// 			console.log('less than 1.7.0');
+		// 		}
+		// 	},
+		// });
 		//向服务器请求进入房间，服务器判断是否可进
 		//是，则转到本局游戏
 		wx.navigateTo({

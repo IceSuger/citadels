@@ -109,8 +109,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 					_this.setData({
 						rid: data.rid
 					});
-					// _this.showError(_this.data.rid);
-					// console.log(_this.data.rid);
+					 _this.showError(_this.data.rid);
+					 console.log(_this.data.rid);
 				});
 			});
 		});
