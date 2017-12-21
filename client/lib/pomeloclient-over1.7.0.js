@@ -647,7 +647,10 @@
   var root = getApp();
   var pomelo = Object.create(EventEmitter.prototype); // object extend from object
   root.pomelo = pomelo;
-  var socket = false;
+  // 微信基础库1.7.0以后，支持存在多个websocket，
+  // 每个都是通过wx.connectSocket返回的SocketTask实例，
+  // 这里的socket即是一个SocketTask
+  var socket = null;  
   var reqId = 0;
   var callbacks = {};
   var handlers = {};
@@ -786,7 +789,7 @@
         pomelo.emit('reconnect');
       }
       reset();
-      socket =true;
+      //socket =true;
       var obj = Package.encode(Package.TYPE_HANDSHAKE, Protocol.strencode(JSON.stringify(handshakeBuffer)));
       send(obj);
     };
@@ -822,20 +825,21 @@
     // socket.onerror = onerror;
     // socket.onclose = onclose;
 
-     wx.connectSocket({
-                // url: `${url}?EIO=3&transport=websocket`
-                url:url
-        
-            });
-     wx.onSocketError(onerror);
-     wx.onSocketOpen(onopen);
-     wx.onSocketMessage(onmessage);
-     wx.onSocketClose(onclose);
+    socket = wx.connectSocket({url:url});
+	socket.onError(onerror);
+	socket.onOpen(onopen);
+	socket.onMessage(onmessage);
+	socket.onClose(onclose);
+     // wx.onSocketError(onerror);
+     // wx.onSocketOpen(onopen);
+     // wx.onSocketMessage(onmessage);
+     // wx.onSocketClose(onclose);
   };
 
   pomelo.disconnect = function() {
     if(socket) {
-      wx.closeSocket()
+      //wx.closeSocket()
+	  socket.close();
       console.log('disconnect');
       socket = false;
     }
@@ -898,8 +902,9 @@
   };
 
   var send = function(packet) {
-    if(socket)
-      wx.sendSocketMessage({data:packet.buffer});
+    // if(socket)
+      // wx.sendSocketMessage({data:packet.buffer});
+	socket.send({data:packet.buffer});
   };
 
   var handler = {};

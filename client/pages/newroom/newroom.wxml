@@ -1,0 +1,15 @@
+<!--pages/newroom/newroom.wxml-->
+<import src="/zanui/field/index.wxml" />
+<import src="/zanui/toptips/index.wxml" />
+<import src="/zanui/stepper/index.wxml" />
+
+<text>pages/newroom/newroom.wxml</text>
+<!-- 使用 Field 圆角样式 -->
+<view class="zan-panel-title field__title--radius">房间人数</view>
+<view style="padding: 40px 15px">
+    <template is="zan-stepper" data="{{ ...stepper1, componentId: 'stepper1' }}" />
+</view>
+<template is="zan-field" data="{{ ...config.radius.passwd }}"></template>
+
+<template is="zan-toptips" data="{{ zanTopTips }}"></template>
+<button class="zan-btn zan-btn--warn" bindtap='createRoom'>新建房间</button>

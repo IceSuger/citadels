@@ -35,5 +35,11 @@ App({
     },
     globalData: {
         userInfo: null
-    }
+    },
+	config: {
+		//host: '10.41.5.102',
+		host: '123.56.1.58',
+		port_gate: 3014
+		
+	}
 })

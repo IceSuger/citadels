@@ -1,14 +1,36 @@
 //index.js
+var Zan = require('../../zanui/index');
+const config = require('./config');
 //获取应用实例
 const app = getApp()
 
-Page({
+Page(Object.assign({}, Zan.TopTips, Zan.Field, {
     data: {
+		config,
         motto: 'Hello World',
         userInfo: {},
         hasUserInfo: false,
         canIUse: wx.canIUse('button.open-type.getUserInfo')
     },
+	
+	handleZanFieldChange(e) {
+		const { componentId, detail } = e;
+
+		console.log('[zan:field:change]', componentId, detail);
+	},
+
+	handleZanFieldFocus(e) {
+		const { componentId, detail } = e;
+
+		console.log('[zan:field:focus]', componentId, detail);
+	},
+
+	handleZanFieldBlur(e) {
+		const { componentId, detail } = e;
+
+		console.log('[zan:field:blur]', componentId, detail);
+	},
+
     //事件处理函数
     bindViewTap: function() {
         wx.navigateTo({
@@ -50,5 +72,20 @@ Page({
             userInfo: e.detail.userInfo,
             hasUserInfo: true
         })
-    }
-})
+    },
+	//进入房间
+    enterRoom: function () {
+		//向服务器请求进入房间，服务器判断是否可进
+		//是，则转到本局游戏
+		wx.navigateTo({
+			url: '../game/game'
+		})
+		//否，则toast提示原因
+	},
+	//创建房间
+	createRoom: function () {
+		wx.navigateTo({
+			url: '../newroom/newroom'
+		})
+	}
+}));
