@@ -7,9 +7,43 @@
   flex: 1;
 }
 .demo__icon {
-  margin: 0 auto;
-  width: 48rpx;
-  height: 48rpx;
+  display: inline-block;
+  width: 72rpx;
+  height: 72rpx;
   background: #ddd;
   border-radius: 4px;
+}
+
+.player_panel{
+	display: inline-block;
+	width: 370rpx;
+	margin: 30rpx 0 0 0;
+	
+}
+
+.building_list{
+	flex-direction: row;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.north_part{
+	display: block;
+}
+
+.south_part{
+	display: block;
+	
+}
+
+.role_text{
+	display: inline-block;
+	font-size: 35rpx;
+	font-weight: 700;
+}
+
+.wxname_text{
+	display: block;
+	font-size: 35rpx;
+	color: #7a7a7a;
 }

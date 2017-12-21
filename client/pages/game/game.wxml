@@ -1,13 +1,46 @@
 <!--pages/game/game.wxml-->
+<import src="/zanui/capsule_xiao/index.wxml" />
+<!--
+player: {
+			wx_name: '', //微信名字
+			avatarUrl: '', //微信头像
+			seatInRoom: 0,  //房间内座次（即进入房间的顺序）
+			buildingCnt: 0,    //已拥有建筑总数
+			buildingList: [],    //已有建筑列表
+			coins: 0,	//手上的金币数
+			buildingCardList: [],   //手上的建筑卡列表
+			handCnt: 0,   //手牌数
+			role: -1    //当前角色
+		},
+		 -->
 <template name="player">
-	<view class="zan-badge demo__icon">
-		<image src="{{avatarUrl}}" class='demo__icon'></image>
-		<view class="zan-badge__count">{{handCnt}}</view>
-	</view>
-	<text>{{role.name_zh}}</text>
-	<view>{{buildingCardList}}</view>
+    <view class="player_panel">
+        <view class="north_part">
+            <!-- <view class="zan-badge demo__icon ">
+                <image src="{{avatarUrl}}" class='demo__icon'></image>
+                <view class="zan-badge__count">{{handCnt}}</view>
+            </view> -->
+			<image src="{{avatarUrl}}" class='demo__icon'></image>
+			<view class="texts" style='display: inline-block'>
+				<view class="wxname_text">{{wx_name}}</view>
+            	<view class="role_text">{{role.name_zh}}  M {{coins}} N {{handCnt}} </view>
+			</view>
+        </view>
+        <view class="building_list south_part">
+            
+                <template wx:for="{{buildingCardList}}" is="capsule_xiao" data="{{...item}}" class="capsule_xiao"/>
+            
+        </view>
+        <!-- <view class="zan-cell zan-cell--last-child">
+            <template is="capsule" data="{{ leftText: '1折', rightText: '限购一份', type: 'danger' }}" />
+        </view> -->
+    </view>
 </template>
 
-<template is="player"></template>
-<template is="player" data="{{...item}}"></template>
-<template is="player"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>
+<template is="player" data="{{...player}}"></template>

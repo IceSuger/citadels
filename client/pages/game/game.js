@@ -8,15 +8,70 @@ Page({
 	 */
 	data: {
 		player: {
-			wx_name: '', //微信名字
+			wx_name: '鲜鱿鱼味香脆饼', //微信名字
 			avatarUrl: '', //微信头像
 			seatInRoom: 0,  //房间内座次（即进入房间的顺序）
 			buildingCnt: 0,    //已拥有建筑总数
 			buildingList: [],    //已有建筑列表
-			coins: 0,	//手上的金币数
-			buildingCardList: [],   //手上的建筑卡列表
-			handCnt: 0,   //手牌数
-			role: -1    //当前角色
+			coins: 2,	//手上的金币数
+			buildingCardList: [{
+				name_zh: "龙门(特)",
+				id: 1,
+				cost: 6,
+				color: 5,
+				score: 8,
+			},
+			{
+				name_zh: "城堡(贵)",
+				id: 2,
+				cost: 4,
+				color: 1,
+				score: 4,
+			},
+			{
+				name_zh: "战场(军)",
+				id: 2,
+				cost: 3,
+				color: 4,
+				score: 3,
+			},
+			{
+				name_zh: "酒馆(商)",
+				id: 2,
+				cost: 1,
+				color: 3,
+				score: 1,
+			},
+			{
+				name_zh: "大教堂(教)",
+				id: 2,
+				cost: 5,
+				color: 2,
+				score: 5,
+			},
+			{
+				name_zh: "城堡(贵)",
+				id: 2,
+				cost: 4,
+				color: 1,
+				score: 4,
+			},
+			{
+				name_zh: "战场(军)",
+				id: 2,
+				cost: 3,
+				color: 4,
+				score: 3,
+			},
+			{
+				name_zh: "酒馆(商)",
+				id: 2,
+				cost: 1,
+				color: 3,
+				score: 1,
+			}],   //手上的建筑卡列表
+			handCnt: 999,   //手牌数
+			role: roleConfig.roles[0]    //当前角色
 		},
 		roles: roleConfig.roles,
 
