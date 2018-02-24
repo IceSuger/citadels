@@ -81,7 +81,8 @@ Page({
 	 * 生命周期函数--监听页面加载
 	 */
 	onLoad: function (options) {
-
+    console.log(options);
+    enterRoom(options);
 	},
 
 	/**
@@ -131,5 +132,36 @@ Page({
 	 */
 	onShareAppMessage: function () {
 
-	}
+	},
+
+  enterRoom: function () {
+    var _this = this;
+    //初始化 pomelo 的 websocket 连接
+    this.queryEntry(function (host, port) {
+      pomelo.init({
+        host: host,	//connector的host和port
+        port: port,
+        log: true,
+      }, function () {
+        var route = "connector.entryHandler.createRoom";
+        var createRoomParam = {
+          passwd: _this.data.roomPasswd,
+          playerTotal: _this.data.stepper1.stepper
+        };
+        pomelo.request(route, createRoomParam, function (data) {
+          pomelo.disconnect();
+          // if (data.error == 1) {
+          // 	//提示房间已存在
+          // 	//this.showZanTopTips('房间已存在');
+          // 	return;
+          // }
+          _this.setData({
+            rid: data.rid
+          });
+          _this.showError(_this.data.rid);
+          console.log(_this.data.rid);
+        });
+      });
+    });
+  }
 })

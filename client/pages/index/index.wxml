@@ -10,8 +10,8 @@
     </view>
     <!-- 使用 Field 圆角样式 -->
     <view class="zan-panel-title field__title--radius">加入房间</view>
-    <template is="zan-field" data="{{ ...config.radius.roomId }}"></template>
-    <template is="zan-field" data="{{ ...config.radius.passwd }}"></template>
+    <template is="zan-field" data="{{ ...config.radius.roomId, componentId:'rid' }}"></template>
+    <template is="zan-field" data="{{ ...config.radius.passwd, componentId:'passwd' }}"></template>
 
     <button class="zan-btn zan-btn--primary" bindtap='enterRoom'>进入房间</button>
     <button class="zan-btn zan-btn--warn" bindtap='createRoom'>新建房间</button>
