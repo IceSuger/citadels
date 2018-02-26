@@ -1,7 +1,8 @@
 // pages/newroom/newroom.js
 var Zan = require('../../zanui/index');
 var pomelo = require('../../lib/pomeloclient-over1.7.0');
-const appConfig = getApp().config;
+const app = getApp()
+const appConfig = app.config;
 const config = require('./config');
 var gateParams = {
 	host: appConfig.host,
@@ -18,9 +19,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 	 */
 	data: {
 		config,
-		rid: 0,
+		roomId: 0,
 		roomPasswd: "",
-		playerTotal: 0,
+		totalPlayer: 0,
 		stepper1: {
 			stepper: 6,
 			min: 3,
@@ -88,32 +89,28 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 	createRoom: function () {
 		var _this = this;
 		//请求后台根据密码和人数创建房间，并返回房间号
-		this.queryEntry(function (host, port) {
-			pomelo.init({
-				host: host,	//connector的host和port
-				port: port,
-				log: true,
-			}, function () {
-				var route = "connector.entryHandler.createRoom";
-				var createRoomParam = {
-					passwd: _this.data.roomPasswd,
-					playerTotal: _this.data.stepper1.stepper
-				};
-				pomelo.request(route, createRoomParam, function (data) {
-					pomelo.disconnect();
-					// if (data.error == 1) {
-					// 	//提示房间已存在
-					// 	//this.showZanTopTips('房间已存在');
-					// 	return;
-					// }
-					_this.setData({
-						rid: data.rid
-					});
-					 _this.showError(_this.data.rid);
-					 console.log(_this.data.rid);
+		// this.queryEntry(function (host, port) {
+		pomelo.init({
+			host: app.globalData.conn_host,	//connector的host和port
+			port: app.globalData.conn_port,
+			log: true,
+		}, function () {
+			var route = "connector.entryHandler.createRoom";
+			var createRoomParam = {
+				passwd: _this.data.roomPasswd,
+				totalPlayer: _this.data.stepper1.stepper
+			};
+			pomelo.request(route, createRoomParam, function (data) {
+				pomelo.disconnect();
+
+				_this.setData({
+					roomId: data.roomId
 				});
+				_this.showError("房间号：" + _this.data.roomId);
+				//  console.log(_this.data.roomId);
 			});
 		});
+		// });
 	},
 
 

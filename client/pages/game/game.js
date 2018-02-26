@@ -1,7 +1,11 @@
 // pages/game/game.js
+var Zan = require('../../zanui/index');
 const roleConfig = require('./roleConfig');
+const consts = require('../../utils/consts');
+const app = getApp();
+var pomelo = app.pomelo;
 
-Page({
+Page(Object.assign({}, Zan.TopTips, {
 
 	/**
 	 * 页面的初始数据
@@ -74,15 +78,23 @@ Page({
 			role: roleConfig.roles[0]    //当前角色
 		},
 		roles: roleConfig.roles,
+		roomId: null,
 
+		playerList: [],
+
+		playerReady: false
+	},
+
+	showError(content) {
+		this.showZanTopTips(content);
 	},
 
 	/**
 	 * 生命周期函数--监听页面加载
 	 */
 	onLoad: function (options) {
-    console.log(options);
-    enterRoom(options);
+		console.log(options);
+		this.enterRoom(options);
 	},
 
 	/**
@@ -134,34 +146,96 @@ Page({
 
 	},
 
-  enterRoom: function () {
-    var _this = this;
-    //初始化 pomelo 的 websocket 连接
-    this.queryEntry(function (host, port) {
-      pomelo.init({
-        host: host,	//connector的host和port
-        port: port,
-        log: true,
-      }, function () {
-        var route = "connector.entryHandler.createRoom";
-        var createRoomParam = {
-          passwd: _this.data.roomPasswd,
-          playerTotal: _this.data.stepper1.stepper
-        };
-        pomelo.request(route, createRoomParam, function (data) {
-          pomelo.disconnect();
-          // if (data.error == 1) {
-          // 	//提示房间已存在
-          // 	//this.showZanTopTips('房间已存在');
-          // 	return;
-          // }
-          _this.setData({
-            rid: data.rid
-          });
-          _this.showError(_this.data.rid);
-          console.log(_this.data.rid);
-        });
-      });
-    });
-  }
-})
+	updatePlayers(playerDict) {
+		var _this = this;
+
+		var playerList = [];
+		for (let item in playerDict) {
+			var _item = playerDict[item];
+			_item['buildingList'] = [];
+			for (let building in _item['buildingDict']) {
+				_item['buildingList'].push(_item['buildingDict'][building]);
+			}
+			playerList.push(_item);
+		}
+
+		_this.setData({
+			playerList: playerList
+		})
+	},
+
+	enterRoom: function (options) {
+		var _this = this;
+		var roomId = Number(options.roomId);
+		var passwd = options.passwd;
+
+		pomelo.init({
+			host: app.globalData.conn_host,	//connector的host和port
+			port: app.globalData.conn_port,
+			log: true,
+		}, function () {
+			var route = "connector.entryHandler.enterRoom";
+			var enterRoomParam = {
+				uid: app.globalData.uid,
+				wxNickName: app.globalData.userInfo.nickName,
+				wxAvatar: app.globalData.userInfo.avatarUrl,
+				roomId: roomId,
+				passwd: passwd
+			};
+
+			//先注册监听房间成员变化的事件
+			pomelo.on('roomMemberChange', function (msg) {
+				// console.log('roomMemberChange' + msg);
+				_this.updatePlayers(msg.playerDict);
+			});
+			pomelo.on('roomReadyChange', function (msg) {
+				// console.log('roomReadyChange' + msg);
+			});
+
+			pomelo.request(route, enterRoomParam, function (data) {
+				// if (data.error == 1) {
+				// 	//提示房间已存在
+				// 	//this.showZanTopTips('房间已存在');
+				// 	return;
+				// }
+
+				if (data.code === consts.ENTER_ROOM.OK) {
+					console.log(data);
+					// _this.setData({
+					// 	roomId: data.roomId
+					// });
+					_this.showError(data);
+				}
+				else {
+					app.globalData.errorCode = data.code;
+					wx.navigateBack({
+						//url: '../index/index?code=' + data.code,
+					})
+				}
+			});
+		});
+	},
+
+	getReady: function () {
+		var _this = this;
+		pomelo.request("core.coreHandler.ready", {}, function (data) {
+			console.log(data);
+			if (data.ret === consts.GET_READY.OK) {
+				_this.setData({
+					playerReady: true
+				})
+			}
+		})
+	},
+
+	cancelReady: function () {
+		var _this = this;
+		pomelo.request("core.coreHandler.cancelReady", {}, function (data) {
+			if (data.ret === consts.GET_READY.OK) {
+				_this.setData({
+					playerReady: false
+				})
+			}
+		})
+	}
+}));

@@ -37,7 +37,10 @@ App({
     // this.pomelo = require('./lib/pomeloclient-over1.7.0');
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+	conn_host: null,	//pomelo connector host
+	conn_port: null,	//pomelo connector port
+	errorCode: null,
   },
   config: {
     //host: '10.41.5.102',
