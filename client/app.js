@@ -38,6 +38,7 @@ App({
   },
   globalData: {
     userInfo: null,
+	uid: null,
 	conn_host: null,	//pomelo connector host
 	conn_port: null,	//pomelo connector port
 	errorCode: null,

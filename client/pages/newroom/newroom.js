@@ -23,8 +23,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 		roomPasswd: "",
 		totalPlayer: 0,
 		stepper1: {
-			stepper: 6,
-			min: 3,
+			stepper: 1,//6
+			min: 1,//todo: 实际版本中，2~3人玩法不同于普通局！
 			max: 7
 		}
 	},

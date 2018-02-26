@@ -1,5 +1,6 @@
 <!--pages/game/game.wxml-->
 <import src="/zanui/capsule_xiao/index.wxml" />
+<import src="/zanui/toptips/index.wxml" />
 
 <template name="player">
     <view class="player_panel">
@@ -47,3 +48,5 @@
 <template is="player" data="{{...player}}"></template>
 
 -->
+
+<template is="zan-toptips" data="{{ zanTopTips }}"></template>

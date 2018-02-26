@@ -81,8 +81,11 @@ Page(Object.assign({}, Zan.TopTips, {
 		roomId: null,
 
 		playerList: [],
+		mySeatNum: null,
+		curPlayer: null,
 
-		playerReady: false
+		playerReady: false,
+		gameon: false
 	},
 
 	showError(content) {
@@ -149,6 +152,7 @@ Page(Object.assign({}, Zan.TopTips, {
 	updatePlayers(playerDict) {
 		var _this = this;
 
+		//把收到的dict转为本地的list
 		var playerList = [];
 		for (let item in playerDict) {
 			var _item = playerDict[item];
@@ -159,8 +163,21 @@ Page(Object.assign({}, Zan.TopTips, {
 			playerList.push(_item);
 		}
 
+		var mySeatNum = null;
+		playerList.forEach(function(value, index, _){
+			// console.log('value.uid:');
+			// console.log(value.uid);
+			// console.log('app.globalData.uid:');
+			// console.log(app.globalData.uid);
+			if(value.uid === app.globalData.uid){
+				//这是我。
+				mySeatNum = index;
+			}
+		})
+
 		_this.setData({
-			playerList: playerList
+			playerList: playerList,
+			mySeatNum: mySeatNum
 		})
 	},
 
@@ -204,7 +221,6 @@ Page(Object.assign({}, Zan.TopTips, {
 					// _this.setData({
 					// 	roomId: data.roomId
 					// });
-					_this.showError(data);
 				}
 				else {
 					app.globalData.errorCode = data.code;
@@ -218,6 +234,32 @@ Page(Object.assign({}, Zan.TopTips, {
 
 	getReady: function () {
 		var _this = this;
+		//按下准备之前，先开始监听开局消息
+		pomelo.on('onPickingRole', function(msg){
+			console.log(msg);
+			var curPlayer = msg.curPlayer;
+			_this.setData({
+				curPlayer : curPlayer
+			})
+			// console.log('curPlayer: ');
+			// console.log(curPlayer);
+			// console.log('mySeatNum: ');
+			// console.log(_this.data.mySeatNum);
+			if(curPlayer === _this.data.mySeatNum){
+				//当前该我行动
+				//弹出可选角色列表
+				//弹出toptip说明当前谁在行动
+				var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+				_this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
+				// console.log('请等待玩家 ' + curPlayerName + ' 选角色...');
+			}else{
+				//当前该其他玩家行动
+				//弹出toptip说明当前谁在行动
+				var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+				_this.showError('请等待玩家 '+ curPlayerName +' 选角色...');
+			}
+			// _this.showZanTopTips('永远跟党走');
+		})
 		pomelo.request("core.coreHandler.ready", {}, function (data) {
 			console.log(data);
 			if (data.ret === consts.GET_READY.OK) {

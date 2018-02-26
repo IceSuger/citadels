@@ -15,7 +15,7 @@ module.exports = {
 
     // options参数默认参数扩展
     options = Object.assign({
-      duration: 3000
+      duration: 2000
     }, options);
 
     // 设置定时器，定时关闭topTips

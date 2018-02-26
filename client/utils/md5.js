@@ -1,4 +1,5 @@
-function md5(string) {
+function md5(obj) {
+	var string = JSON.stringify(obj);
 	var x = Array();
 	var k, AA, BB, CC, DD, a, b, c, d;
 	var S11 = 7, S12 = 12, S13 = 17, S14 = 22;
