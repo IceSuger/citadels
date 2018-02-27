@@ -2,6 +2,7 @@
 var Zan = require('../../zanui/index');
 const roleConfig = require('./roleConfig');
 const consts = require('../../utils/consts');
+const buildings = require('../../utils/buildings');
 const app = getApp();
 var pomelo = app.pomelo;
 
@@ -28,19 +29,12 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			selectedId: 'situation',
 			scroll: false
 		},
+		//静态建筑牌字典
+		staticBuildingDict: null,
+		//我的手牌
+		handCards: null,
 		//选角色相关
-		pickableRoleList: [
-			{
-				padding: 0,
-				value: '1',
-				name: '选项一',
-			},
-			// {
-			// 	padding: 0,
-			// 	value: '2',
-			// 	name: '选项二',
-			// },
-		],
+		pickableRoleList: [],
 		checkedRole: -1,
 		bannedAndShownRoleList: [],
 		roleIdPicked: null,
@@ -126,11 +120,24 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		this.showZanTopTips(content);
 	},
 
+	initStaticBuildingDict() {
+		/**
+		 * 由于静态的建筑，其id都是唯一的，且都是Number，所以这里虽然名为dict，实际上却以数组来实现staticBuildingDict。
+		 */
+		var dict = [];
+		buildings.forEach(function (value, index, _) {
+			dict[value.id] = value;
+		});
+		this.setData({
+			staticBuildingDict: dict
+		});
+	},
 	/**
 	 * 生命周期函数--监听页面加载
 	 */
 	onLoad: function (options) {
 		console.log(options);
+		this.initStaticBuildingDict();
 		this.setData({
 			roomId: options.roomId
 		})
@@ -203,8 +210,21 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			//增加一些用于本地显示的属性
 			_item.ready = false;
 			_item.roleName_zh = _this.data.roles[Number(_item.role)].name_zh;
+			// //把已建造的（建筑牌id）映射成建筑牌对象
+			// var handCardObjs = [];
+			// _item.handCards.forEach(function (cardId, _, __) {
+			// 	handCardObjs.push(_this.data.staticBuildingDict[v_card]);
+			// })
+			// _item.handCardObjs = handCardObjs;
+
 			playerList.push(_item);
 		}
+
+		//把我的手牌（建筑牌id）映射成建筑牌对象
+		var handCardObjs = [];
+		playerDict[app.globalData.uid].handCards.forEach(function (cardId, _, __) {
+			handCardObjs.push(_this.data.staticBuildingDict[cardId]);
+		})
 
 		if (!_this.data.mySeatNum) {
 			var mySeatNum = null;
@@ -224,7 +244,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		}
 
 		_this.setData({
-			playerList: playerList
+			playerList: playerList,
+			handCards: handCardObjs
 		})
 		console.log(playerList);
 	},
@@ -296,6 +317,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		var _this = this;
 		//按下准备之前，先开始监听开局消息
 		pomelo.on('onPickingRole', _this.onPickingRole);
+		// 监听选完角色后的行动消息
+		pomelo.on('onTakingAction', _this.onTakingAction);
 		pomelo.on('onSituationUpdate', function (msg) {
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
@@ -348,7 +371,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		// console.log('CONFIRMMING PICKING ROLE.');
 		// console.log(this.data.roleIdPicked);
 		var msg = {
-			roleId: this.data.roleIdPicked
+			roleId: this.data.roleIdPicked,
+			seatId: this.data.mySeatNum
 		}
 		pomelo.request("core.coreHandler.pickRole", msg, null);//null指不传入callback，单向通知服务器。
 		//发出选角色的请求后，退回“局势”
@@ -371,7 +395,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		console.log(msg);
 		//开始选角色了，表明游戏开始了，标记一下，便于局势渲染。尽管每次收到选角色的推送都会标记一次，但开销很小无所谓。
 		_this.setData({
-			gameOn : true
+			gameOn: true
 		})
 
 		var curPlayer = msg.curPlayer;
@@ -390,10 +414,32 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		} else {
 			//当前该其他玩家行动
 			//弹出toptip说明当前谁在行动
+
+			console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
 			var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
 			_this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
 		}
 
+	},
+
+	onTakingAction(msg){
+		var _this = this;
+		var curPlayer = msg.curPlayer;
+		_this.setData({
+			curPlayer: curPlayer
+		})
+		if (curPlayer === _this.data.mySeatNum) {
+			//当前该我行动
+			//弹出可进行的操作？
+			_this.switchToTab('help');
+		} else {
+			//当前该其他玩家行动
+			//弹出toptip说明当前谁在行动
+
+			console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
+			var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+			_this.showError('请等待玩家 ' + curPlayerName + ' 行动...');
+		}
 	},
 
 	switchToTab(selectedId) {

@@ -59,6 +59,10 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 				userInfo: app.globalData.userInfo,
 				hasUserInfo: true
 			})
+			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+			app.globalData.uid = MD5.md5(app.globalData.userInfo);
+			console.log(app.globalData.userInfo);
+			this.queryEntryAndEnableBtn();
 		} else if (this.data.canIUse) {
 			// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
 			// 所以此处加入 callback 以防止这种情况
@@ -70,6 +74,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 				//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
 				app.globalData.uid = MD5.md5(app.globalData.userInfo);
 				console.log(app.globalData.userInfo);
+				this.queryEntryAndEnableBtn();
 			}
 		} else {
 			// 在没有 open-type=getUserInfo 版本的兼容处理
@@ -82,8 +87,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 					})
 				}
 			})
+			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+			app.globalData.uid = MD5.md5(app.globalData.userInfo);
+			console.log(app.globalData.userInfo);
+			this.queryEntryAndEnableBtn();
 		}
 
+		
+
+	},
+
+	queryEntryAndEnableBtn(){
+		var _this = this;
 		//如果是第一次进入index页面，则conn_host还未知，则查询之
 		if (!app.globalData.conn_host) {
 			//初始化pomelo连接
@@ -104,10 +119,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 			})
 		}
 
-		
 	},
 
-	onShow: function(){
+	onShow: function () {
 		var _this = this;
 		//如果是进入房间失败，从game页自动退回来的，则将错误代码写入了app全局变量
 		var code = Number(app.globalData.errorCode);

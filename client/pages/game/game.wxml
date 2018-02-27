@@ -20,7 +20,7 @@
         </view>
         <view class="building_list south_part">
 
-            <template wx:for="{{buidingDict}}" is="capsule_xiao" data="{{...item}}" class="capsule_xiao" />
+            <template wx:for="{{buidingDict}}" is="capsule_xiao" data="{{...item, staticBuildingDict}}" class="capsule_xiao" />
 
         </view>
 
@@ -50,19 +50,20 @@
     <template is="zan-tab" data="{{tab: tab, componentId: 'tab'}}"></template>
 </view>
 
-<!-- 各个tab -->
+<!-- 各个 tab 的内容 -->
 <block wx:if="{{tab.selectedId == 'situation'}}">
     <block wx:for="{{playerList}}" wx:for-item="player">
         <block wx:if="{{gameOn}}">
-            <template is="player_gameOn" data="{{...player}}"></template>
+            <template is="player_gameOn" data="{{...player, staticBuildingDict}}"></template>
         </block>
         <block wx:else>
-            <template is="player_gameOff" data="{{...player}}"></template>
+            <template is="player_gameOff" data="{{...player, ready}}"></template>
         </block>
     </block>
-
-    <button class="zan-btn zan-btn--primary" wx:if="{{!playerReady}}" bindtap='getReady'>准备</button>
-    <button class="zan-btn zan-btn--primary" wx:else bindtap='cancelReady'>取消准备</button>
+    <block wx:if="{{!gameOn}}">
+        <button class="zan-btn zan-btn--primary" wx:if="{{!playerReady}}" bindtap='getReady'>准备</button>
+        <button class="zan-btn zan-btn--primary" wx:else bindtap='cancelReady'>取消准备</button>
+    </block>
 </block>
 
 <block wx:elif="{{tab.selectedId == 'move'}}">
@@ -85,6 +86,9 @@
     </view>
 </block>
 <block wx:elif="{{tab.selectedId == 'hand'}}">
+    <block wx:for="{{handCards}}" wx:for-item="card">
+        <button class="zan-btn zan-btn--primary" bindtap='' id='{{card.id}}'>{{card.cost}}费 {{card.color}}色 {{card.name}}</button>
+    </block>
 </block>
 <block wx:elif="{{tab.selectedId == 'help'}}">
 </block>
