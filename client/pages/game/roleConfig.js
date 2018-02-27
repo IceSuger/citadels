@@ -1,6 +1,9 @@
 module.exports = {
 	roles: [
 		{
+			name_zh: "——", //中文名
+		},
+		{
 			name_zh: "刺客", //中文名
 			color: 0, //0~5
 			ability: assasin, //函数指针

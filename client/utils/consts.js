@@ -84,5 +84,13 @@ module.exports = {
 		TAKE_BUILDING_CARDS: 1,
 	},
 
-	BANK_INIT_COINS: 30
+	BANK_INIT_COINS: 300,
+
+	CLIENT_ONLY: {
+		EVENT: {
+			PICK_ROLE: 11,
+
+		}
+	}
+
 };

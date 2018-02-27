@@ -19,9 +19,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 	 */
 	data: {
 		config,
-		roomId: 0,
-		roomPasswd: "",
-		totalPlayer: 0,
+		roomId: null,
+		passwd: '',
+		totalPlayer: null,
 		stepper1: {
 			stepper: 1,//6
 			min: 1,//todo: 实际版本中，2~3人玩法不同于普通局！
@@ -49,7 +49,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 		const { componentId, detail } = e;
 
 		this.setData({
-			roomPasswd: detail.value
+			passwd: detail.value
 		});
 		console.log('[zan:field:change]', componentId, detail);
 	},
@@ -97,7 +97,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 		}, function () {
 			var route = "connector.entryHandler.createRoom";
 			var createRoomParam = {
-				passwd: _this.data.roomPasswd,
+				passwd: _this.data.passwd,
 				totalPlayer: _this.data.stepper1.stepper
 			};
 			pomelo.request(route, createRoomParam, function (data) {
@@ -108,9 +108,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 				});
 				_this.showError("房间号：" + _this.data.roomId);
 				//  console.log(_this.data.roomId);
+				_this.enterRoom();
 			});
 		});
 		// });
+	},
+
+	//进入房间
+	enterRoom: function () {
+		var _this = this;
+		wx.navigateTo({
+			url: '../game/game?roomId=' + Number(_this.data.roomId) + '&passwd=' + _this.data.passwd,
+		})
 	},
 
 

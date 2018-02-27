@@ -1,43 +1,93 @@
 <!--pages/game/game.wxml-->
 <import src="/zanui/capsule_xiao/index.wxml" />
 <import src="/zanui/toptips/index.wxml" />
+<import src="/zanui/tab/index.wxml" />
+<import src="/zanui/select/index.wxml" />
+<import src="/zanui/dialog/index.wxml" />
 
-<template name="player">
+<template name="player_gameOn">
     <view class="player_panel">
         <view class="north_part">
             <!-- <view class="zan-badge demo__icon ">
                 <image src="{{avatarUrl}}" class='demo__icon'></image>
                 <view class="zan-badge__count">{{handCnt}}</view>
             </view> -->
-			<image src="{{wxAvatar}}" class='demo__icon'></image>
-			<view class="texts" style='display: inline-block'>
-				<view class="wxname_text">{{wxNickName}}</view>
-            	<view class="role_text">{{role.name_zh}}  M {{coins}} N {{handCards.length}} </view>
-			</view>
+            <image src="{{wxAvatar}}" class='demo__icon'></image>
+            <view class="texts" style='display: inline-block'>
+                <view class="wxname_text">{{wxNickName}}</view>
+                <view class="role_text">{{roleName_zh}} 金币 {{coins}} 手牌 {{handCards.length}}</view>
+            </view>
         </view>
         <view class="building_list south_part">
-            
-                <template wx:for="{{buidingDict}}" is="capsule_xiao" data="{{...item}}" class="capsule_xiao"/>
-            
+
+            <template wx:for="{{buidingDict}}" is="capsule_xiao" data="{{...item}}" class="capsule_xiao" />
+
+        </view>
+
+        <!-- <view class="zan-cell zan-cell--last-child">
+            <template is="capsule" data="{{ leftText: '1折', rightText: '限购一份', type: 'danger' }}" />
+        </view> -->
+    </view>
+</template>
+
+<template name="player_gameOff">
+    <view class="player_panel">
+
+        <view class="north_part">
+            <image src="{{wxAvatar}}" class='demo__icon'></image>
+            <view class="texts" style='display: inline-block'>
+                <view class="wxname_text">{{wxNickName}}</view>
+                <view class="zan-tag zan-tag--primary" wx:if="{{ready}}">准备</view>
+            </view>
         </view>
         <!-- <view class="zan-cell zan-cell--last-child">
             <template is="capsule" data="{{ leftText: '1折', rightText: '限购一份', type: 'danger' }}" />
         </view> -->
     </view>
 </template>
-<!--
-<template wx:for="{{playerList}}" is="player" data="{{...player}}"></template>
--->
 
-<block wx:for="{{playerList}}" wx:for-item="player">
-	<template is="player" data="{{...player}}"></template>
+<view style="margin: 0px 0">
+    <template is="zan-tab" data="{{tab: tab, componentId: 'tab'}}"></template>
+</view>
+
+<!-- 各个tab -->
+<block wx:if="{{tab.selectedId == 'situation'}}">
+    <block wx:for="{{playerList}}" wx:for-item="player">
+        <block wx:if="{{gameOn}}">
+            <template is="player_gameOn" data="{{...player}}"></template>
+        </block>
+        <block wx:else>
+            <template is="player_gameOff" data="{{...player}}"></template>
+        </block>
+    </block>
+
+    <button class="zan-btn zan-btn--primary" wx:if="{{!playerReady}}" bindtap='getReady'>准备</button>
+    <button class="zan-btn zan-btn--primary" wx:else bindtap='cancelReady'>取消准备</button>
 </block>
 
-<button class="zan-btn zan-btn--primary" wx:if="{{!playerReady}}" bindtap='getReady'>准备</button>
-<button class="zan-btn zan-btn--primary" wx:else bindtap='cancelReady'>取消准备</button>
-<button class="zan-btn zan-btn--danger"></button>
-<button class="zan-btn zan-btn--warn"></button>
-
+<block wx:elif="{{tab.selectedId == 'move'}}">
+    <view class="zan-panel-title">可选角色</view>
+    <view class="zan-panel">
+        <!-- <view>
+            <template is="zan-select" data="{{ pickableRoleList, checkedValue: checkedRole, componentId: 'pickRoleList' }}"></template>
+        </view> -->
+        <block wx:for="{{pickableRoleList}}" wx:for-item="role">
+            <button class="zan-btn zan-btn--primary" bindtap='pickRole' id='{{role.value}}'>{{role.value}} {{role.name}}</button>
+        </block>
+    </view>
+    <view class="zan-panel-title">翻开的已丢弃角色</view>
+    <view class="zan-panel">
+        <view>
+            <block wx:for="{{bannedAndShownRoleList}}" wx:for-item="role">
+                <button class="zan-btn " disabled>{{role.value}} {{role.name}}</button>
+            </block>
+        </view>
+    </view>
+</block>
+<block wx:elif="{{tab.selectedId == 'hand'}}">
+</block>
+<block wx:elif="{{tab.selectedId == 'help'}}">
+</block>
 <!--
 <template is="player" data="{{...player}}"></template>
 <template is="player" data="{{...player}}"></template>
@@ -50,3 +100,4 @@
 -->
 
 <template is="zan-toptips" data="{{ zanTopTips }}"></template>
+<template is="zan-dialog" data="{{ zanDialog }}"></template>
