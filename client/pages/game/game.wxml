@@ -67,23 +67,47 @@
 </block>
 
 <block wx:elif="{{tab.selectedId == 'move'}}">
-    <view class="zan-panel-title">可选角色</view>
-    <view class="zan-panel">
-        <!-- <view>
+    <view class="zan-panel-title">我本轮的角色: 	{{roleIdPicked}} {{roles[roleIdPicked].name_zh}} </view>
+	<view class="zan-panel"></view>
+    <!-- <view class="zan-panel">
+	{{roleIdPicked}} {{roles[roleIdPicked].name_zh}}
+        <button class="zan-btn zan-btn--primary" bindtap="{{ mePickingRole ? 'pickRole' : '' }}" data-role-id='{{roleIdPicked}}'>{{roleIdPicked}} {{roles[roleIdPicked].name_zh}}</button>
+    </view> -->
+	<!-- 可选和不可选角色列表 -->
+    <block wx:if="{{mePickingRole}}">
+        <view class="zan-panel-title">可选角色</view>
+        <view class="zan-panel">
+            <!-- <view>
             <template is="zan-select" data="{{ pickableRoleList, checkedValue: checkedRole, componentId: 'pickRoleList' }}"></template>
         </view> -->
-        <block wx:for="{{pickableRoleList}}" wx:for-item="role">
-            <button class="zan-btn zan-btn--primary" bindtap='pickRole' id='{{role.value}}'>{{role.value}} {{role.name}}</button>
-        </block>
-    </view>
-    <view class="zan-panel-title">翻开的已丢弃角色</view>
-    <view class="zan-panel">
-        <view>
-            <block wx:for="{{bannedAndShownRoleList}}" wx:for-item="role">
-                <button class="zan-btn " disabled>{{role.value}} {{role.name}}</button>
+
+            <block wx:for="{{pickableRoleList}}" wx:for-item="role">
+                <button class="zan-btn zan-btn--primary" bindtap="{{ mePickingRole ? 'pickRole' : '' }}" data-role-id='{{role.value}}' disabled="{{ !mePickingRole ? true : false}}">{{role.value}} {{role.name}}</button>
             </block>
         </view>
-    </view>
+        <view class="zan-panel-title">翻开的已丢弃角色</view>
+        <view class="zan-panel">
+            <view>
+                <block wx:for="{{bannedAndShownRoleList}}" wx:for-item="role">
+                    <button class="zan-btn " disabled>{{role.value}} {{role.name}}</button>
+                </block>
+            </view>
+        </view>
+    </block>
+	<!-- 可执行行动列表 -->
+	<block wx:else>
+		<view class="zan-panel-title">当前可执行的动作</view>
+        <view class="zan-panel">
+            <view>
+                <block wx:for="{{actionList}}" wx:for-item="action">
+                    <button class="zan-btn zan-btn--primary" data-action-id="{{action.actionId}}" bindtap="takeCoinsOrCards">{{action.content}}</button>
+                </block>
+            </view>
+        </view>
+	</block>
+
+
+
 </block>
 <block wx:elif="{{tab.selectedId == 'hand'}}">
     <block wx:for="{{handCards}}" wx:for-item="card">
@@ -92,16 +116,6 @@
 </block>
 <block wx:elif="{{tab.selectedId == 'help'}}">
 </block>
-<!--
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-<template is="player" data="{{...player}}"></template>
-
--->
 
 <template is="zan-toptips" data="{{ zanTopTips }}"></template>
 <template is="zan-dialog" data="{{ zanDialog }}"></template>

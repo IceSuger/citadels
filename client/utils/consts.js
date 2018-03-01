@@ -1,3 +1,6 @@
+/**
+ * Created by X93 on 2018/2/14.
+ */
 module.exports = {
 	ROLES: {
 		NONE: 0,
@@ -70,10 +73,10 @@ module.exports = {
 		OK: 0,
 		ERROR: 1
 	},
-
-	GAME: {
-		NEXT_PLAYER_PICK_ROLE: 1
-	},
+	//
+	// GAME:{
+	//     NEXT_PLAYER_PICK_ROLE: 1
+	// },
 
 	ACTION: {
 		COINS: 1,
@@ -81,7 +84,24 @@ module.exports = {
 	},
 
 	MOVE: {
+		DO_SOMETHING: 0,
 		TAKE_BUILDING_CARDS: 1,
+		TAKE_COINS: 2,
+		PICKING_ROLE: 3
+	},
+
+	CAN_TAKE_COIN_COUNT: {
+		NORMAL: 2
+	},
+
+	CAN_TAKE_CARD_COUNT: {
+		NORMAL: 2,
+		OBSERVATORY: 3
+	},
+
+	CAN_HAVE_CARD_COUNT: {
+		NORMAL: 1,
+		LIBRARY: 2
 	},
 
 	BANK_INIT_COINS: 300,
@@ -90,7 +110,11 @@ module.exports = {
 		EVENT: {
 			PICK_ROLE: 11,
 
+		},
+		GAME_STATE: {
+			ROLE_PICKING: 11,
+			COIN_OR_CARD: 12,
+			ABILITY: 13,
 		}
 	}
-
 };
