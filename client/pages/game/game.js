@@ -18,7 +18,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 				title: '局势'
 			}, {
 				id: 'move',
-				title: '行动'
+				title: '动作'
 			}, {
 				id: 'hand',
 				title: '手牌'
@@ -41,10 +41,25 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		mePickingRole: false,
 		//可执行动作列表
 		actionList: null,
+		meTakingCoinOrCard: false,
+		//从牌堆摸牌后的候选牌列表：
+		candidateCardList: [],
+		//从牌堆摸牌后，可以保留几张加入手牌
+		pickableCardCnt: null,
 		//本轮已知角色的玩家列表（元素为seatId）
 		knownRolePlayers: [],
 		//当前游戏状态
 		curState: null,
+		//我可以发动角色技能吗
+		roleAbilityUsable: false,
+		//我场上的建筑带有的主动技能
+		buildingAbilitys: false,
+		//我现在可以结束我的回合
+		meCanEndRound: false,
+		//角色发动主动技能，选角色
+		showBottomPopup: false,
+		//本轮被杀的角色id，用于盗贼技能合法性判断
+		roleIdKilled: null,
 
 		player: {
 			wx_name: '鲜鱿鱼味香脆饼', //微信名字
@@ -115,7 +130,10 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		roomId: null,
 
 		playerList: [],
+		roomMemberCnt: 0,
+		roomMemberMax: 0,
 		mySeatNum: null,
+		myRoleId: null,
 		curPlayer: null,
 
 		playerReady: false,
@@ -145,16 +163,20 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		var _this = this;
 		console.log(options);
 		this.initStaticBuildingDict();
+		this.initRoleNamesList();
 		this.setData({
 			roomId: options.roomId
 		})
-		wx.setNavigationBarTitle({
-			title: '房间 ' + options.roomId,
-		})
+		// wx.setNavigationBarTitle({
+		// 	title: '房间 ' + options.roomId,
+		// })
 		//先注册监听房间成员变化的事件
 		pomelo.on('roomMemberChange', function (msg) {
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
+			wx.setNavigationBarTitle({
+				title: `房间 ${options.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
+			})
 		});
 		pomelo.on('roomReadyChange', function (msg) {
 			// console.log('roomReadyChange' + msg);
@@ -179,7 +201,6 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
 		});
-		pomelo.on('buildingCandidates', _this.showBuildingCandidates);
 
 		pomelo.on('onMove', _this.showCurMove);
 		//监听游戏状态变化
@@ -187,8 +208,25 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		this.enterRoom(options);
 	},
 
-	showBuildingCandidates(msg) {
-
+	initRoleNamesList() {
+		var roleNames = [];
+		console.log(this.data.roles);
+		// this.data.roles.forEach(function(role, index, _){
+		// 	if(index === 0){
+		// 		continue;
+		// 	}
+		// 	// roleNames.push(`${index}  ${role.name_zh}`);
+		// })
+		var roles = this.data.roles;
+		roles.forEach(function (role, index, _) {
+			console.log(index);
+			if (index !== 0) {
+				roleNames.push(`${index}  ${role.name_zh}`);
+			}
+		})
+		this.setData({
+			roleNames: roleNames
+		})
 	},
 
 	gameStateChange(msg) {
@@ -257,9 +295,6 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 
 	updatePlayers(playerDict) {
 		var _this = this;
-
-		//【暂时的曲线救国】先把当前场上已知的角色名字保存出来，避免下面对playerList的赋值会覆盖它们。
-
 
 		//把收到的dict转为本地的list
 		var playerList = [];
@@ -334,6 +369,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 
 		_this.setData({
 			playerList: playerList,
+			roomMemberCnt: playerList.length,
 			handCards: handCardObjs
 		})
 		console.log(playerList);
@@ -366,17 +402,22 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 				// 	//this.showZanTopTips('房间已存在');
 				// 	return;
 				// }
-
-				if (data.code === consts.ENTER_ROOM.OK) {
+				if (data.retmsg.code === consts.ENTER_ROOM.OK) {
 					console.log(data);
+					_this.setData({
+						roomMemberMax: data.retmsg.roomMemberMax
+					})
+					wx.setNavigationBarTitle({
+						title: `房间 ${options.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
+					})
 					// _this.setData({
 					// 	roomId: data.roomId
 					// });
 				}
 				else {
-					app.globalData.errorCode = data.code;
+					app.globalData.errorCode = data.retmsg.code;
 					wx.navigateBack({
-						//url: '../index/index?code=' + data.code,
+						//url: '../index/index?code=' + data.retmsg.code,
 					})
 				}
 			});
@@ -440,7 +481,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		pomelo.request("core.coreHandler.pickRole", msg, null);//null指不传入callback，单向通知服务器。
 		//发出请求后，只保留已选角色的按钮亮，但移除bindtap事件，其他的都disable
 		this.setData({
-			mePickingRole: false
+			mePickingRole: false,
+			myRoleId: this.data.roleIdPicked
 		})
 		//发出选角色的请求后，退回“局势”
 		this.switchToTab('situation');
@@ -463,7 +505,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		//开始选角色了，表明游戏开始了，标记一下，便于局势渲染。尽管每次收到选角色的推送都会标记一次，但开销很小无所谓。
 		_this.setData({
 			gameOn: true,
-			curState: consts.CLIENT_ONLY.GAME_STATE.ROLE_PICKING
+			curState: consts.GAME_STATE.ROLE_PICKING
 		})
 
 		var curPlayer = msg.curPlayer;
@@ -497,10 +539,10 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		var _this = this;
 		var curPlayer = msg.curPlayer;
 		console.log(`curPlayer: ${curPlayer}, _this.data.curPlayer: ${_this.data.curPlayer}`);
-		console.log(`_this.data.curState: ${_this.data.curState} === ${consts.CLIENT_ONLY.GAME_STATE.ROLE_PICKING}`);
+		console.log(`_this.data.curState: ${_this.data.curState} === ${consts.GAME_STATE.ROLE_PICKING}`);
 		//先判断是不是进入下一个玩家的回合了
-		// if (curPlayer !== _this.data.curPlayer || _this.data.curState === consts.CLIENT_ONLY.GAME_STATE.ROLE_PICKING){
-		// 	_this.data.curState = consts.CLIENT_ONLY.GAME_STATE.COIN_OR_CARD;
+		// if (curPlayer !== _this.data.curPlayer || _this.data.curState === consts.GAME_STATE.ROLE_PICKING){
+		// 	_this.data.curState = consts.GAME_STATE.COIN_OR_CARD;
 		// 	console.log("??????");
 		// 	//当前玩家变了，说明进入下一个人的回合了，那就把他的身份亮出来
 		// 	// var knownRolePlayers = _this.data.knownRolePlayers;
@@ -525,6 +567,25 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		console.log(_this.data.roles[Number(msg.roleId)].name_zh);
 		if (curPlayer === _this.data.mySeatNum) {
 			//当前该我行动
+			//判断一下我有没有主动技能
+			// if (msg.roleId === consts.ROLES.ASSASSIN){
+
+			// }else if(msg.roleId === consts.ROLES.THIEF){
+
+			// }else if(msg.roleId === consts.ROLES.MAGICIAN){
+
+			// }else if(msg.roleId === consts.ROLES.WARLORD){
+
+			// }
+			if (_this.data.roles[msg.roleId].hasActiveAbility) {
+				_this.setData({
+					roleAbilityUsable: true
+				})
+			}
+
+			_this.setData({
+				meTakingCoinOrCard: true
+			})
 			//弹出可进行的操作
 			var actionList = [];
 
@@ -539,7 +600,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			actionList[0] = takeCoinsAction;
 			actionList[1] = takeCardsAction;
 			_this.setData({
-				actionList: actionList
+				actionList: actionList,
+				pickableCardCnt: msg.canHaveCardCnt
 			})
 			_this.switchToTab('move');
 		} else {
@@ -559,24 +621,66 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			move: move
 		}
 		pomelo.request("core.coreHandler.takeCoinsOrBuildingCards", msg, function (msg) {
-			var actionList = [];
+			var cardList = [];
 			//如果有返回，就是返回了候选建筑牌列表
 			if (!!msg.candidates) {
 				//弹出候选建筑牌
+				_this.setData({
+					mePickingBuildingCard: true
+				})
 				//把候选建筑牌（建筑牌id）映射成建筑牌对象
 				msg.candidates.forEach(function (cardId, _, __) {
 					var card = _this.data.staticBuildingDict[cardId];
-					var action = {
+					var cardInList = {
 						content: `${card.cost}费 ${card.color}色 ${card.name}`,
-						actionId: cardId
+						cardId: cardId
 					}
-					actionList.push(action);
+					cardList.push(cardInList);
 				})
 			}
 			_this.setData({
-				actionList: actionList
+				candidateCardList: cardList
 			})
-		});//null指不传入callback，单向通知服务器。
+		});
+		_this.setData({
+			meCanEndRound: true,
+			meTakingCoinOrCard: false
+		})
+	},
+
+	pickThisCard2MyHandcards: function (e) {
+		var _this = this;
+		var index = e.currentTarget.dataset.index;
+		var pickableCardCnt = _this.data.pickableCardCnt;
+		// var pickedList = _this.data.pickedList;
+		//标记当前事件对应的牌为已选
+		_this.setData({
+			[`candidateCardList[${index}].picked`]: true,
+			pickableCardCnt: pickableCardCnt - 1
+		})
+
+		//判断当前是否已经选完要加入手牌的建筑牌
+		if (_this.data.pickableCardCnt === 0) {
+			//已选完，那就把 pickedList 和 notPickedList 都塞进 msg 发给服务器
+			var pickedList = [];
+			var notPickedList = [];
+			_this.data.candidateCardList.forEach((cardInList, _, __) => {
+				if (cardInList.picked) {
+					pickedList.push(cardInList.cardId);
+				} else {
+					notPickedList.push(cardInList.cardId);
+				}
+			})
+			var msg = {
+				pickedList: pickedList,
+				notPickedList: notPickedList
+			}
+			pomelo.request("core.coreHandler.pickBuildingCard", msg, null);//null指不传入callback，单向通知服务器。
+			//标记状态：我选完加入手牌的牌了
+			_this.setData({
+				mePickingBuildingCard: false
+			})
+		}
 	},
 
 	switchToTab(selectedId) {
@@ -614,6 +718,99 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		console.log(pickableRoleList);
 		console.log(_this.data.pickableRoleList);
 	},
+
+	/**
+	 * 角色主动技能们
+	 */
+	ASSASSIN() {
+		/**
+		 * 刺杀。
+		 * 目标可以是任何角色。
+		 * 
+		 * 弹出按钮列表
+		 */
+		var _this = this;
+		_this.setData({
+			showBottomPopup: true
+		})
+	},
+
+	/**
+	 * 根据我的不同身份，确定不同的技能
+	 */
+	actuallyUseAbilityOnRole(e){
+		var _this = this;
+		console.log('picker发送选择改变，携带值为', e.detail.value)
+		var targetRoleId = Number(e.detail.value) + 1;
+		var ret;
+		if(_this.data.myRoleId === consts.ROLES.ASSASSIN){
+			ret = _this.doKill(targetRoleId);
+		}else if(_this.data.myRoleId === consts.ROLES.THIEF){
+			ret = _this.doSteal(targetRoleId);
+		}
+		if (ret === consts.CLIENT_ONLY.ERROR.INVALID_TARGET){
+			console.log('请珍爱生命，不要自杀。');
+			_this.showError('请珍爱生命，不要自杀。');
+		} else if (ret === consts.CLIENT_ONLY.ERROR.INVALID_TARGET){
+			console.log('不能偷 刺客 和 被刺杀的角色。');
+			_this.showError('不能偷 刺客 和 被刺杀的角色。');
+		}else{
+			_this.setData({
+				roleAbilityUsable: false
+			})
+			return;
+		}
+		// this.setData({
+		// 	index: e.detail.value
+		// })
+	},
+
+	doKill(targetRoleId) {
+		// var targetRoleId = e.currentTarget.dataset.roleId;
+		if(targetRoleId === consts.ROLES.ASSASSIN){
+			return consts.CLIENT_ONLY.ERROR.INVALID_TARGET;
+		}
+		var msg = {
+			targetRoleId: targetRoleId
+		}
+		pomelo.request("core.coreHandler.useAbility", msg, null);
+	},
+
+	thief() {
+		/**
+		 * 偷取金币。
+		 * 目标角色：不能是刺客和killed。
+		 */
+		var _this = this;
+		_this.setData({
+			showBottomPopup: true
+		})
+	},
+
+	doSteal(targetRoleId){
+		if(targetRoleId === consts.ROLES.ASSASSIN){
+			return consts.CLIENT_ONLY.ERROR.INVALID_TARGET;
+		} else if (targetRoleId === this.data.roleIdKilled ){
+			return consts.CLIENT_ONLY.ERROR.INVALID_TARGET;
+		}
+		var msg = {
+			targetRoleId: targetRoleId
+		}
+		pomelo.request("core.coreHandler.useAbility", msg, null);
+	},
+
+	magician() {
+
+	},
+
+	warlord() {
+
+	},
+
+
+	/**
+	 * 下面是ZanUI相关的
+	 */
 
 	handleZanTabChange(e) {
 		var componentId = e.componentId;

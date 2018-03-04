@@ -6,7 +6,8 @@ module.exports = {
 		{
 			name_zh: "刺客", //中文名
 			color: 0, //0~5
-			ability: assasin, //函数指针
+			ability: 'assasin', //函数指针
+			ability_zh: "刺杀",
 			description: "", //介绍
 			wholePic: "",    //原画
 			avatar: "",  //头像
@@ -16,7 +17,8 @@ module.exports = {
 		{
 			name_zh: "盗贼", //中文名
 			color: 0, //0~5
-			ability: thief, //函数指针
+			ability: 'thief', //函数指针
+			ability_zh: "偷取",
 			description: "", //介绍
 			wholePic: "",    //原画
 			avatar: "",  //头像
@@ -26,7 +28,8 @@ module.exports = {
 		{
 			name_zh: "魔术师", //中文名
 			color: 0, //0~5
-			ability: magician, //函数指针
+			ability: 'magician', //函数指针
+			ability_zh: "换牌",
 			description: "", //介绍
 			wholePic: "",    //原画
 			avatar: "",  //头像
@@ -71,12 +74,13 @@ module.exports = {
 			wholePic: "",    //原画
 			avatar: "",  //头像
 			actionOrder: 1, //行动顺序
-			hasActiveAbility: true,   //bool
+			hasActiveAbility: false,   //bool
 		},
 		{
 			name_zh: "军阀", //中文名
 			color: 4, //0~5
-			ability: warlord, //函数指针
+			ability: 'warlord', //函数指针
+			ability_zh: "摧毁",
 			description: "", //介绍
 			wholePic: "",    //原画
 			avatar: "",  //头像

@@ -67,13 +67,13 @@
 </block>
 
 <block wx:elif="{{tab.selectedId == 'move'}}">
-    <view class="zan-panel-title">我本轮的角色: 	{{roleIdPicked}} {{roles[roleIdPicked].name_zh}} </view>
-	<view class="zan-panel"></view>
+    <view class="zan-panel-title">我本轮的角色: {{roleIdPicked}} {{roles[roleIdPicked].name_zh}} </view>
+    <view class="zan-panel"></view>
     <!-- <view class="zan-panel">
 	{{roleIdPicked}} {{roles[roleIdPicked].name_zh}}
         <button class="zan-btn zan-btn--primary" bindtap="{{ mePickingRole ? 'pickRole' : '' }}" data-role-id='{{roleIdPicked}}'>{{roleIdPicked}} {{roles[roleIdPicked].name_zh}}</button>
     </view> -->
-	<!-- 可选和不可选角色列表 -->
+    <!-- 可选和不可选角色列表 -->
     <block wx:if="{{mePickingRole}}">
         <view class="zan-panel-title">可选角色</view>
         <view class="zan-panel">
@@ -94,9 +94,19 @@
             </view>
         </view>
     </block>
-	<!-- 可执行行动列表 -->
-	<block wx:else>
-		<view class="zan-panel-title">当前可执行的动作</view>
+    <block wx:elif="{{mePickingBuildingCard}}">
+        <view class="zan-panel-title">选择{{pickableCardCnt}}张建筑牌加入手牌</view>
+        <view class="zan-panel">
+            <view>
+                <block wx:for="{{candidateCardList}}" wx:for-item="card">
+                    <button class="zan-btn zan-btn--primary" data-index="{{index}}" bindtap="pickThisCard2MyHandcards" disabled='{{card.picked}}'>{{card.content}}</button>
+                </block>
+            </view>
+        </view>
+    </block>
+    <!-- 可执行行动列表 -->
+    <block wx:elif="{{meTakingCoinOrCard}}">
+        <view class="zan-panel-title">当前可执行的动作</view>
         <view class="zan-panel">
             <view>
                 <block wx:for="{{actionList}}" wx:for-item="action">
@@ -104,7 +114,44 @@
                 </block>
             </view>
         </view>
-	</block>
+    </block>
+    <!-- 可结束自己当前回合 -->
+    <block wx:elif="{{myRoundNow}}">
+        <view class="zan-panel-title">是否结束回合</view>
+        <view class="zan-panel">
+            <button class="zan-btn zan-btn--danger" bindtap="endMyRound">结束回合</button>
+        </view>
+    </block>
+    <!-- 可使用的角色主动技能 -->
+    <block wx:elif="{{roleAbilityUsable}}">
+        <view class="zan-panel-title">角色主动技能</view>
+        <!-- <view class="zan-panel">
+            <button class="zan-btn zan-btn--warn" bindtap="{{roles[ playerList[mySeatNum].role ].ability}}">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button>
+        </view> -->
+        <!-- 选择目标角色 WeUI -->
+        <picker bindchange="actuallyUseAbilityOnRole" value="0" range="{{roleNames}}">
+            <!-- <button class="zan-btn zan-btn--warn" bindtap="{{roles[ playerList[mySeatNum].role ].ability}}">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button> -->
+            <button class="zan-btn zan-btn--warn">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button>
+        </picker>
+        <!-- 选择目标角色 ZanUI 
+        <view class="popup-example--bottom zan-popup zan-popup--bottom {{ showBottomPopup ? 'zan-popup--show' : ''}}">
+            <view class="zan-popup__mask" catchtap="toggleBottomPopup"></view>
+            <view class="zan-popup__container">
+                <view class="zan-btns">
+                    <button class="zan-btn zan-btn--small" catchtap="doKill">
+                        关闭 popup
+                    </button>
+                </view>
+            </view>
+        </view>-->
+    </block>
+    <!-- 有主动技能的建筑 -->
+    <block wx:elif="{{buildingAbilityUsable}}">
+        <view class="zan-panel-title">建筑的技能</view>
+        <view class="zan-panel">
+
+        </view>
+    </block>
 
 
 
