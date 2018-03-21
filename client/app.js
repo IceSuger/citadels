@@ -39,14 +39,16 @@ App({
   globalData: {
     userInfo: null,
 	uid: null,
-	conn_host: null,	//pomelo connector host
-	conn_port: null,	//pomelo connector port
+	conn_host: 'bighead81.club',	//pomelo connector host
+	//小程序不允许带端口号，只能用默认443.所以这里通过目录，在服务器上用nginx反向代理实现将请求转发到不同端口上。
+	conn_port: '/conn/',	//pomelo connector port 
 	errorCode: null,
   },
   config: {
-    //host: '10.41.5.102',
-    host: '123.56.1.58',
-    port_gate: 3014
+    // host: '123.56.1.58',
+	  host: 'bighead81.club',
+    // port_gate: 3014
+	port_gate: '/ggate/'
 
   },
   //全局pomelo单例

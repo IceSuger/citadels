@@ -93,31 +93,22 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 			this.queryEntryAndEnableBtn();
 		}
 
-		
+
 
 	},
 
-	queryEntryAndEnableBtn(){
+/**
+ * 自动0.0.11.2版本开始，就不再在index页面查询connector了。
+ * 因为connector可以直接写死，就是 域名+目录，然后服务器端nginx将其代理到不同的pomelo端口中。
+ * 这样搞的原因是：微信小程序只允许通过wss（TLS）访问已备案域名，且不能带端口号，只能用默认的443端口。
+ */
+	queryEntryAndEnableBtn() {
 		var _this = this;
-		//如果是第一次进入index页面，则conn_host还未知，则查询之
-		if (!app.globalData.conn_host) {
-			//初始化pomelo连接
-
-			//询问本用户对应的connector，并记录在app全局变量中
-			this.queryEntry(function (host, port) {
-				app.globalData.conn_host = host;
-				app.globalData.conn_port = port;
-				//激活按钮
-				_this.setData({
-					btn_disabled: false
-				})
-			});
-		} else {
-			//激活按钮
-			_this.setData({
-				btn_disabled: false
-			})
-		}
+		
+		//激活按钮
+		_this.setData({
+			btn_disabled: false
+		})
 
 	},
 

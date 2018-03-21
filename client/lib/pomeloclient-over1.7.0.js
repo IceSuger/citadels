@@ -702,10 +702,12 @@
     encode = params.encode || defaultEncode;
     decode = params.decode || defaultDecode;
 
-    var url = 'ws://' + host;
+    // var url = 'ws://' + host;
+	var url = 'wss://' + host;//小程序必须用HTTPS
     if(port) {
-      url +=  ':' + port;
-    }
+    //   url +=  ':' + port;
+		url += port;
+    }//小程序不允许带端口号，只能用默认443。这里的所谓port，只是域名后面跟的子目录
 
     handshakeBuffer.user = params.user;
     // if(params.encrypt) {

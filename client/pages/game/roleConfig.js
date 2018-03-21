@@ -6,7 +6,7 @@ module.exports = {
 		{
 			name_zh: "刺客", //中文名
 			color: 0, //0~5
-			ability: 'assasin', //函数指针
+			ability: 'assassin', //函数指针
 			ability_zh: "刺杀",
 			description: "", //介绍
 			wholePic: "",    //原画

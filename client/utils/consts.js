@@ -122,6 +122,7 @@ module.exports = {
 
 		ERROR: {
 			INVALID_TARGET: 11,
+			SUICIDE_NOT_ALLOWED: 12
 		}
 	}
 };

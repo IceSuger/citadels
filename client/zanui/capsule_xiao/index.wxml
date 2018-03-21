@@ -2,47 +2,47 @@
     <view class="zan-capsule zan-capsule--{{type}}">
         <!-- <block wx:if="{{color == 1}}">
             <view class="zan-capsule__left" style="background: #ee9a00; border-color: #ee9a00 ">{{ cost }}费{{score}}分</view>
-            <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 2}}">
             <view class="zan-capsule__left" style="background: #4876ff ; border-color: #4876ff ">{{ cost }}费{{score}}分</view>
-            <view class="zan-capsule__right" style="color: #4876ff ; border-color: #4876ff ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #4876ff ; border-color: #4876ff ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 3}}">
             <view class="zan-capsule__left" style="background: #00cd00 ; border-color: #00cd00 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #00cd00 ; border-color: #00cd00 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #00cd00 ; border-color: #00cd00 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 4}}">
             <view class="zan-capsule__left" style="background: #ee0000 ; border-color: #ee0000 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #ee0000 ; border-color: #ee0000 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #ee0000 ; border-color: #ee0000 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 5}}">
             <view class="zan-capsule__left" style="background: #a020f0 ; border-color: #a020f0 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name }}</view>
         </block>
         <block wx:else>
             <view class="zan-capsule__left">{{ cost }} 费 {{score}} 分 </view>
-            <view class="zan-capsule__right">{{ name_zh }}</view>
+            <view class="zan-capsule__right">{{ name }}</view>
         </block> -->
 		<block wx:if="{{color == 1}}">
             <view class="zan-capsule__left" style="background: #ee9a00; border-color: #ee9a00 ">{{ cost }}</view>
-            <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 2}}">
             <view class="zan-capsule__left" style="background: #4876ff ; border-color: #4876ff ">{{ cost }}</view>
-            <view class="zan-capsule__right" style="color: #4876ff ; border-color: #4876ff ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #4876ff ; border-color: #4876ff ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 3}}">
             <view class="zan-capsule__left" style="background: #00cd00 ; border-color: #00cd00 ">{{ cost }}</view>
-            <view class="zan-capsule__right" style="color: #00cd00 ; border-color: #00cd00 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #00cd00 ; border-color: #00cd00 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 4}}">
             <view class="zan-capsule__left" style="background: #ee0000 ; border-color: #ee0000 ">{{ cost }}</view>
-            <view class="zan-capsule__right" style="color: #ee0000 ; border-color: #ee0000 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #ee0000 ; border-color: #ee0000 ">{{ name }}</view>
         </block>
         <block wx:elif="{{color == 5}}">
             <view class="zan-capsule__left" style="background: #a020f0 ; border-color: #a020f0 ">{{ cost }}</view>
-            <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name_zh }}</view>
+            <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name }}</view>
         </block>
     </view>
 </template>

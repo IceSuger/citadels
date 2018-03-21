@@ -38,12 +38,12 @@
 
 .role_text{
 	display: inline-block;
-	font-size: 35rpx;
+	font-size: 14px;
 	font-weight: 700;
 }
 
 .wxname_text{
 	display: block;
-	font-size: 35rpx;
+	font-size: 14px;
 	color: #7a7a7a;
 }

@@ -6,12 +6,16 @@ const buildings = require('../../utils/buildings');
 const app = getApp();
 var pomelo = app.pomelo;
 
-Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
+Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.NoticeBar, {
 
 	/**
 	 * 页面的初始数据
 	 */
 	data: {
+		testBool: false,
+		noticeBar: {
+			text: '澳门首家线上富饶之城开业啦！屠龙宝刀，点击就送！',
+		},
 		tab: {
 			list: [{
 				id: 'situation',
@@ -55,77 +59,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		//我场上的建筑带有的主动技能
 		buildingAbilitys: false,
 		//我现在可以结束我的回合
-		meCanEndRound: false,
+		myRoundNow: false,
 		//角色发动主动技能，选角色
 		showBottomPopup: false,
 		//本轮被杀的角色id，用于盗贼技能合法性判断
 		roleIdKilled: null,
+		//我正在进行建造
+		meDoingBuild: false,
 
-		player: {
-			wx_name: '鲜鱿鱼味香脆饼', //微信名字
-			avatarUrl: '', //微信头像
-			seatInRoom: 0,  //房间内座次（即进入房间的顺序）
-			buildingCnt: 0,    //已拥有建筑总数
-			buildingList: [],    //已有建筑列表
-			coins: 2,	//手上的金币数
-			buildingCardList: [{
-				name_zh: "龙门(特)",
-				id: 1,
-				cost: 6,
-				color: 5,
-				score: 8,
-			},
-			{
-				name_zh: "城堡(贵)",
-				id: 2,
-				cost: 4,
-				color: 1,
-				score: 4,
-			},
-			{
-				name_zh: "战场(军)",
-				id: 2,
-				cost: 3,
-				color: 4,
-				score: 3,
-			},
-			{
-				name_zh: "酒馆(商)",
-				id: 2,
-				cost: 1,
-				color: 3,
-				score: 1,
-			},
-			{
-				name_zh: "大教堂(教)",
-				id: 2,
-				cost: 5,
-				color: 2,
-				score: 5,
-			},
-			{
-				name_zh: "城堡(贵)",
-				id: 2,
-				cost: 4,
-				color: 1,
-				score: 4,
-			},
-			{
-				name_zh: "战场(军)",
-				id: 2,
-				cost: 3,
-				color: 4,
-				score: 3,
-			},
-			{
-				name_zh: "酒馆(商)",
-				id: 2,
-				cost: 1,
-				color: 3,
-				score: 1,
-			}],   //手上的建筑卡列表
-			role: roleConfig.roles[0]    //当前角色
-		},
 		roles: roleConfig.roles,
 		roomId: null,
 
@@ -238,10 +179,20 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 	showCurMove(msg) {
 		var _this = this;
 		var curPlayer = msg.curPlayer;
-		var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+		var curPlayerObj = _this.data.playerList[curPlayer];
+		var curPlayerName = curPlayerObj.wxNickName;
 		if (msg.move === consts.MOVE.TAKE_BUILDING_CARDS) {
-			_this.showError(curPlayerName + ' 正在拿取建筑牌...');
+			// _this.showError(curPlayerName + ' 正在拿取建筑牌...');
+			_this.showNews(`请等待  ${curPlayerObj.roleName_zh}（${curPlayerName}）拿取建筑牌...`);
 		}
+	},
+
+	showNews(msg){
+		this.setData({
+			'noticeBar.text': msg
+		})
+		// // 滚动通告栏需要initScroll
+		// this.initZanNoticeBarScroll('noticeBar');
 	},
 
 	/**
@@ -255,7 +206,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 	 * 生命周期函数--监听页面显示
 	 */
 	onShow: function () {
-
+		// 滚动通告栏需要initScroll
+		this.initZanNoticeBarScroll('noticeBar');
 	},
 
 	/**
@@ -302,7 +254,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			var playerObj = playerDict[uid];
 			playerObj['buildingList'] = [];
 			for (let building in playerObj['buildingDict']) {
-				playerObj['buildingList'].push(playerObj['buildingDict'][building]);
+				console.log(building);
+				playerObj['buildingList'].push(_this.data.staticBuildingDict[building]);
 			}
 			//增加一些用于本地显示的属性
 			playerObj.ready = false;
@@ -383,6 +336,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		pomelo.init({
 			host: app.globalData.conn_host,	//connector的host和port
 			port: app.globalData.conn_port,
+			// port: '/conn/', //小程序不允许带端口号，只能用默认443.所以这里通过目录，在服务器上用nginx反向代理实现将请求转发到不同端口上。
 			log: true,
 		}, function () {
 			var route = "connector.entryHandler.enterRoom";
@@ -522,17 +476,22 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			_this.updatePickableRoleList(msg.roleList);
 			_this.switchToTab('move');
 			_this.setData({
-				mePickingRole: true
+				mePickingRole: true,
+				myRoleId: null,
+				roleIdPicked: null
 			})
 		} else {
 			//当前该其他玩家行动
 			//弹出toptip说明当前谁在行动
 
 			console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
-			var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
-			_this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
+			// var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+			// // _this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
+			// _this.showNews('请等待玩家 ' + curPlayerName + ' 选角色...');
 		}
-
+		var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+		// _this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
+		_this.showNews('请等待玩家 ' + curPlayerName + ' 选角色...');
 	},
 
 	onTakingAction(msg) {
@@ -567,23 +526,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		console.log(_this.data.roles[Number(msg.roleId)].name_zh);
 		if (curPlayer === _this.data.mySeatNum) {
 			//当前该我行动
-			//判断一下我有没有主动技能
-			// if (msg.roleId === consts.ROLES.ASSASSIN){
-
-			// }else if(msg.roleId === consts.ROLES.THIEF){
-
-			// }else if(msg.roleId === consts.ROLES.MAGICIAN){
-
-			// }else if(msg.roleId === consts.ROLES.WARLORD){
-
-			// }
 			if (_this.data.roles[msg.roleId].hasActiveAbility) {
 				_this.setData({
 					roleAbilityUsable: true
 				})
+			}else{
+				_this.setData({
+					roleAbilityUsable: false
+				})
 			}
 
 			_this.setData({
+				myRoundNow: true,
 				meTakingCoinOrCard: true
 			})
 			//弹出可进行的操作
@@ -600,6 +554,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			actionList[0] = takeCoinsAction;
 			actionList[1] = takeCardsAction;
 			_this.setData({
+				myRoundNow: true,
 				actionList: actionList,
 				pickableCardCnt: msg.canHaveCardCnt
 			})
@@ -608,10 +563,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 			//当前该其他玩家行动
 			//弹出toptip说明当前谁在行动
 
-			console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
-			var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
-			_this.showError('请等待玩家 ' + curPlayerName + ' 行动...');
+			// console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
+			// var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+			// _this.showError('请等待玩家 ' + curPlayerName + ' 行动...');
 		}
+		console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
+		var curPlayerObj = _this.data.playerList[curPlayer];
+		var curPlayerName = curPlayerObj.wxNickName;
+		_this.showNews(`请等待  ${curPlayerObj.roleName_zh}（${curPlayerName}）行动...`);
 	},
 
 	takeCoinsOrCards: function (e) {
@@ -642,9 +601,19 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 				candidateCardList: cardList
 			})
 		});
+		/**
+		 * 拿完金币或建筑牌，就可以开始进行建造了
+		 */
+		var buildChance;
+		if (this.data.myRoleId == consts.ROLES.ARCHITECT){
+			buildChance = 3
+		}else{
+			buildChance = 1
+		}
 		_this.setData({
-			meCanEndRound: true,
-			meTakingCoinOrCard: false
+			meTakingCoinOrCard: false,
+			// canBuild: true,
+			buildChance: buildChance
 		})
 	},
 
@@ -720,9 +689,67 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 	},
 
 	/**
+	 * 开始建造建筑，切到手牌页，并enable每个建筑的按钮事件
+	 */
+	beginBuild(){
+		var _this = this;
+		var meDoingBuild = true;
+		_this.setData({
+			meDoingBuild: true
+		})
+		this.switchToTab('hand');
+	},
+
+	/**
+	 * 建这个建筑。
+	 * 判断手头金币是否足够建造，若不够则报错；
+	 * 判断自己场上是否已有相同建筑，若有则报错，若无，则向服务器发请求。
+	 */
+	buildChosenBuilding(e){
+		var cardId = e.currentTarget.dataset.cardId;
+		var myPlayerObj = this.data.playerList[this.data.mySeatNum];
+		// console.log(myPlayerObj);
+
+		if (myPlayerObj.coins < this.data.staticBuildingDict[cardId].cost){
+			//钱不够
+			this.showError('金币不足，建造失败。');
+			return;
+		}
+
+		if(!myPlayerObj.buildingDict.hasOwnProperty(cardId)){
+			//该建筑不在我的已有建筑中
+			pomelo.request("core.coreHandler.build", {
+				cardId: cardId
+			}, null);
+			this.checkIfCanBuildMore();
+			this.switchToTab('move');
+		}else{
+			//我已拥有相同建筑
+			this.showError('已拥有相同建筑，建造失败。')
+		}
+	},
+
+	/**
+	 * 判断是否还可以继续建造。
+	 * 如果是建筑师，则有三个名额；如果不是，则只有一个名额。
+	 */
+	checkIfCanBuildMore(){
+		this.setData({
+			buildChance: this.data.buildChance - 1
+		})
+
+		// if (this.data.buildChance <= 0){
+		// 	//已经没有继续建造的机会了
+		// 	this.setData({
+		// 		canBuild: false
+		// 	})
+		// }
+	},
+
+	/**
 	 * 角色主动技能们
 	 */
-	ASSASSIN() {
+	assassin() {
 		/**
 		 * 刺杀。
 		 * 目标可以是任何角色。
@@ -748,7 +775,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 		}else if(_this.data.myRoleId === consts.ROLES.THIEF){
 			ret = _this.doSteal(targetRoleId);
 		}
-		if (ret === consts.CLIENT_ONLY.ERROR.INVALID_TARGET){
+		if (ret === consts.CLIENT_ONLY.ERROR.SUICIDE_NOT_ALLOWED){
 			console.log('请珍爱生命，不要自杀。');
 			_this.showError('请珍爱生命，不要自杀。');
 		} else if (ret === consts.CLIENT_ONLY.ERROR.INVALID_TARGET){
@@ -768,7 +795,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 	doKill(targetRoleId) {
 		// var targetRoleId = e.currentTarget.dataset.roleId;
 		if(targetRoleId === consts.ROLES.ASSASSIN){
-			return consts.CLIENT_ONLY.ERROR.INVALID_TARGET;
+			return consts.CLIENT_ONLY.ERROR.SUICIDE_NOT_ALLOWED;
 		}
 		var msg = {
 			targetRoleId: targetRoleId
@@ -807,7 +834,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, {
 
 	},
 
-
+	endMyRound(){
+		var _this = this;
+		pomelo.request("core.coreHandler.endRound", {}, null);
+		_this.setData({
+			myRoundNow: false
+		})
+	},
+	
 	/**
 	 * 下面是ZanUI相关的
 	 */

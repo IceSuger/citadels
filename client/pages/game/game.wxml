@@ -4,30 +4,35 @@
 <import src="/zanui/tab/index.wxml" />
 <import src="/zanui/select/index.wxml" />
 <import src="/zanui/dialog/index.wxml" />
+<import src="/zanui/noticebar/index.wxml" />
 
 <template name="player_gameOn">
-    <view class="player_panel">
-        <view class="north_part">
-            <!-- <view class="zan-badge demo__icon ">
+    <!-- 选择目标角色 WeUI -->
+    <picker bindchange='mePickingTargetPlayer ? showBuildingsOfTargetPlayer ' value="0" range="{{buildingList}}" >
+
+        <view class="player_panel" >
+            <view class="north_part">
+                <!-- <view class="zan-badge demo__icon ">
                 <image src="{{avatarUrl}}" class='demo__icon'></image>
                 <view class="zan-badge__count">{{handCnt}}</view>
             </view> -->
-            <image src="{{wxAvatar}}" class='demo__icon'></image>
-            <view class="texts" style='display: inline-block'>
-                <view class="wxname_text">{{wxNickName}}</view>
-                <view class="role_text">{{roleName_zh}} 金币 {{coins}} 手牌 {{handCards.length}}</view>
+                <image src="{{wxAvatar}}" class='demo__icon'></image>
+                <view class="texts" style='display: inline-block'>
+                    <view class="wxname_text">{{wxNickName}}</view>
+                    <view class="role_text">{{roleName_zh}} 金币 {{coins}} 手牌 {{handCards.length}}</view>
+                </view>
             </view>
-        </view>
-        <view class="building_list south_part">
+            <view class="building_list south_part">
 
-            <template wx:for="{{buidingDict}}" is="capsule_xiao" data="{{...item, staticBuildingDict}}" class="capsule_xiao" />
+                <template wx:for="{{buildingList}}" is="capsule_xiao" data="{{...item, staticBuildingDict}}" class="capsule_xiao" />
 
-        </view>
+            </view>
 
-        <!-- <view class="zan-cell zan-cell--last-child">
+            <!-- <view class="zan-cell zan-cell--last-child">
             <template is="capsule" data="{{ leftText: '1折', rightText: '限购一份', type: 'danger' }}" />
         </view> -->
-    </view>
+        </view>
+    </picker>
 </template>
 
 <template name="player_gameOff">
@@ -45,6 +50,10 @@
         </view> -->
     </view>
 </template>
+
+<view class="zan-panel">
+    <template is="zan-noticebar" data="{{ ...noticeBar, componentId: 'noticeBar'  }}"></template>
+</view>
 
 <view style="margin: 0px 0">
     <template is="zan-tab" data="{{tab: tab, componentId: 'tab'}}"></template>
@@ -115,51 +124,50 @@
             </view>
         </view>
     </block>
-    <!-- 可结束自己当前回合 -->
-    <block wx:elif="{{myRoundNow}}">
-        <view class="zan-panel-title">是否结束回合</view>
-        <view class="zan-panel">
-            <button class="zan-btn zan-btn--danger" bindtap="endMyRound">结束回合</button>
-        </view>
-    </block>
     <!-- 可使用的角色主动技能 -->
-    <block wx:elif="{{roleAbilityUsable}}">
+    <block wx:if="{{roleAbilityUsable}}">
         <view class="zan-panel-title">角色主动技能</view>
-        <!-- <view class="zan-panel">
-            <button class="zan-btn zan-btn--warn" bindtap="{{roles[ playerList[mySeatNum].role ].ability}}">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button>
-        </view> -->
+
         <!-- 选择目标角色 WeUI -->
         <picker bindchange="actuallyUseAbilityOnRole" value="0" range="{{roleNames}}">
             <!-- <button class="zan-btn zan-btn--warn" bindtap="{{roles[ playerList[mySeatNum].role ].ability}}">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button> -->
-            <button class="zan-btn zan-btn--warn">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button>
+            <!-- <button class="zan-btn zan-btn--warn">{{roles[ playerList[mySeatNum].role ].ability_zh}}</button> -->
+			<button class="zan-btn zan-btn--warn">{{roles[ myRoleId ].ability_zh}}</button>
         </picker>
-        <!-- 选择目标角色 ZanUI 
-        <view class="popup-example--bottom zan-popup zan-popup--bottom {{ showBottomPopup ? 'zan-popup--show' : ''}}">
-            <view class="zan-popup__mask" catchtap="toggleBottomPopup"></view>
-            <view class="zan-popup__container">
-                <view class="zan-btns">
-                    <button class="zan-btn zan-btn--small" catchtap="doKill">
-                        关闭 popup
-                    </button>
-                </view>
-            </view>
-        </view>-->
+
     </block>
     <!-- 有主动技能的建筑 -->
-    <block wx:elif="{{buildingAbilityUsable}}">
+    <block wx:if="{{buildingAbilityUsable}}">
         <view class="zan-panel-title">建筑的技能</view>
         <view class="zan-panel">
 
         </view>
     </block>
 
+    <!-- 建造 -->
+    <block wx:if="{{myRoundNow && !mePickingBuildingCard && !meTakingCoinOrCard && buildChance > 0}}">
+        <view class="zan-panel-title">当前可执行的动作</view>
+        <view class="zan-panel">
+            <button class="zan-btn zan-btn--primary" bindtap="beginBuild">建造建筑</button>
+        </view>
+    </block>
 
+    <!-- 可结束自己当前回合 -->
+    <block wx:if="{{myRoundNow}}">
+        <view class="zan-panel-title">是否结束回合</view>
+        <view class="zan-panel">
+            <button class="zan-btn zan-btn--danger" bindtap="endMyRound">结束回合</button>
+        </view>
+    </block>
 
 </block>
 <block wx:elif="{{tab.selectedId == 'hand'}}">
-    <block wx:for="{{handCards}}" wx:for-item="card">
-        <button class="zan-btn zan-btn--primary" bindtap='' id='{{card.id}}'>{{card.cost}}费 {{card.color}}色 {{card.name}}</button>
-    </block>
+    <view class="zan-panel-title" wx:if="{{meDoingBuild}}">我的金币： {{playerList[mySeatNum].coins}}</view>
+    <view class="zan-panel">
+        <block wx:for="{{handCards}}" wx:for-item="card">
+            <button class="zan-btn zan-btn--primary" bindtap="{{meDoingBuild ? 'buildChosenBuilding' : '' }}" data-card-id='{{card.id}}'>{{card.cost}}费 {{card.color}}色 {{card.name}}</button>
+        </block>
+    </view>
 </block>
 <block wx:elif="{{tab.selectedId == 'help'}}">
 </block>
