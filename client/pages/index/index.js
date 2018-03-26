@@ -170,7 +170,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 	//进入房间
 	enterRoom: function () {
 		var _this = this;
-		pomelo.disconnect();
+		// pomelo.disconnect();
 		wx.navigateTo({
 			url: '../game/game?roomId=' + Number(_this.data.roomId) + '&passwd=' + _this.data.passwd,
 		})

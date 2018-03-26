@@ -241,7 +241,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			}
 		});
 		//监听日志到来
-		pomelo.on('onLog', (msg)=>{
+		pomelo.on('onLog', (msg) => {
 			// console.log(msg);
 			_this.showNews(msg.log.split('] ')[1]);
 			// console.log(_this.data.logs);
@@ -251,24 +251,12 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				logs: logs
 			})
 		});
-		//监听掉线
-		pomelo.on('disconnect', function () {
-			console.log('掉线了');
-			_this.ask4Reconnect();
-			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-			app.globalData.disconnected = true;
-		});
-		pomelo.on('heartbeat timeout', function () {
-			console.log('心跳超时');
-			_this.ask4Reconnect();
-			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-			app.globalData.disconnected = true;
-		});
+
 
 		this.enterRoom(options);
 	},
 
-	ask4Reconnect(){
+	ask4Reconnect() {
 		var _this = this;
 		//弹窗，问是否重连
 		wx.showModal({
@@ -362,7 +350,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		// 滚动通告栏需要initScroll
 		this.initZanNoticeBarScroll('noticeBar');
 		//判断是否已断线，若是，则询问是否重连
-		if(app.globalData.disconnected === true){
+		if (app.globalData.disconnected === true) {
 			this.ask4Reconnect();
 		}
 	},
@@ -378,7 +366,11 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 * 生命周期函数--监听页面卸载
 	 */
 	onUnload: function () {
-		// pomelo.disconnect();
+		//打标记：这是用户主动断开的连接
+		this.setData({
+			activeDisconnect: true
+		})
+		pomelo.disconnect();
 	},
 
 	/**
@@ -530,8 +522,25 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 					// _this.setData({
 					// 	roomId: data.roomId
 					// });
+					//监听掉线
+					pomelo.on('disconnect', function () {
+						if (!_this.data.activeDisconnect) {
+							console.log('掉线了');
+							_this.ask4Reconnect();
+							//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+							app.globalData.disconnected = true;
+						}
+					});
+					pomelo.on('heartbeat timeout', function () {
+						console.log('心跳超时');
+						_this.ask4Reconnect();
+						//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+						app.globalData.disconnected = true;
+					});
 				}
-				else {
+				else if (app.globalData.disconnected === true) {
+					_this.ask4Reconnect();
+				} else {
 					app.globalData.errorCode = data.retmsg.code;
 					wx.navigateBack({
 						//url: '../index/index?code=' + data.retmsg.code,
@@ -1135,7 +1144,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		}
 	},
 
-	cancelDemolish(){
+	cancelDemolish() {
 		this.setData({
 			pickingBuilding2demolish: false,
 			mePickingTargetPlayer: false
@@ -1328,7 +1337,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	/**
 	 * 丢弃此手牌，换取1金币
 	 */
-	labDiscardCard(e){
+	labDiscardCard(e) {
 		var cardId = e.currentTarget.dataset.cardId;
 		var msg = {
 			cardId: cardId
@@ -1340,7 +1349,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		})
 	},
 
-	cancelLabDiscard(){
+	cancelLabDiscard() {
 		this.setData({
 			laboratoryDiscardingCards: false
 		})
