@@ -91,12 +91,14 @@ module.exports = {
 	},
 
 	CAN_TAKE_COIN_COUNT: {
-		NORMAL: 2
+		NORMAL: 2,
+		MERCHANT: 1
 	},
 
 	CAN_TAKE_CARD_COUNT: {
 		NORMAL: 2,
-		OBSERVATORY: 3
+		OBSERVATORY: 3,
+		ARCHITECT: 2
 	},
 
 	CAN_HAVE_CARD_COUNT: {
@@ -112,6 +114,17 @@ module.exports = {
 		ROLE_PICKING: 11,
 		COIN_OR_CARD: 12,
 		ABILITY: 13,
+	},
+
+	END_GAME: {
+		ALL_COLOR_CNT: 5,
+		FULL_BUILDING: 8
+	},
+
+	SCORE: {
+		FIRST_FULL_PLAYER: 4,
+		OTHER_FULL_PLAYER: 2,
+		ALL_COLOR: 3
 	},
 
 	CLIENT_ONLY: {

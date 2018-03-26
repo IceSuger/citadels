@@ -23,9 +23,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, Zan.Stepper, {
 		passwd: '',
 		totalPlayer: null,
 		stepper1: {
-			stepper: 1,//6
+			stepper: 2,//6
 			min: 1,//todo: 实际版本中，2~3人玩法不同于普通局！
-			max: 7
+			max: 6
 		}
 	},
 

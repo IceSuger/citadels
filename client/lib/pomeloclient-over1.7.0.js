@@ -703,7 +703,7 @@
     decode = params.decode || defaultDecode;
 
     // var url = 'ws://' + host;
-	var url = 'wss://' + host;//小程序必须用HTTPS
+	var url = 'wss://' + host;//小程序必须用TLS
     if(port) {
     //   url +=  ':' + port;
 		url += port;

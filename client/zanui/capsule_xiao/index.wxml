@@ -1,30 +1,6 @@
 <template name="capsule_xiao">
     <view class="zan-capsule zan-capsule--{{type}}">
-        <!-- <block wx:if="{{color == 1}}">
-            <view class="zan-capsule__left" style="background: #ee9a00; border-color: #ee9a00 ">{{ cost }}费{{score}}分</view>
-            <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name }}</view>
-        </block>
-        <block wx:elif="{{color == 2}}">
-            <view class="zan-capsule__left" style="background: #4876ff ; border-color: #4876ff ">{{ cost }}费{{score}}分</view>
-            <view class="zan-capsule__right" style="color: #4876ff ; border-color: #4876ff ">{{ name }}</view>
-        </block>
-        <block wx:elif="{{color == 3}}">
-            <view class="zan-capsule__left" style="background: #00cd00 ; border-color: #00cd00 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #00cd00 ; border-color: #00cd00 ">{{ name }}</view>
-        </block>
-        <block wx:elif="{{color == 4}}">
-            <view class="zan-capsule__left" style="background: #ee0000 ; border-color: #ee0000 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #ee0000 ; border-color: #ee0000 ">{{ name }}</view>
-        </block>
-        <block wx:elif="{{color == 5}}">
-            <view class="zan-capsule__left" style="background: #a020f0 ; border-color: #a020f0 ">{{ cost }}费{{score}} 分 </view>
-            <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name }}</view>
-        </block>
-        <block wx:else>
-            <view class="zan-capsule__left">{{ cost }} 费 {{score}} 分 </view>
-            <view class="zan-capsule__right">{{ name }}</view>
-        </block> -->
-		<block wx:if="{{color == 1}}">
+        <block wx:if="{{color == 1}}">
             <view class="zan-capsule__left" style="background: #ee9a00; border-color: #ee9a00 ">{{ cost }}</view>
             <view class="zan-capsule__right" style="color: #ee9a00; border-color: #ee9a00 ">{{ name }}</view>
         </block>
@@ -44,5 +20,27 @@
             <view class="zan-capsule__left" style="background: #a020f0 ; border-color: #a020f0 ">{{ cost }}</view>
             <view class="zan-capsule__right" style="color: #a020f0 ; border-color: #a020f0 ">{{ name }}</view>
         </block>
+
+        <!--
+		<block wx:if="{{color == 1}}">
+            <view class="zan-capsule__left" style="background: #DAA520; border-color: #DAA520 ">{{ cost }}</view>
+            <view class="zan-capsule__right" style="color: #DAA520; border-color: #DAA520 ">{{ name }}</view>
+        </block>
+        <block wx:elif="{{color == 2}}">
+            <view class="zan-capsule__left" style="background: #4A708B ; border-color: #4A708B ">{{ cost }}</view>
+            <view class="zan-capsule__right" style="color: #4A708B ; border-color: #4A708B ">{{ name }}</view>
+        </block>
+        <block wx:elif="{{color == 3}}">
+            <view class="zan-capsule__left" style="background: #548B54 ; border-color: #548B54 ">{{ cost }}</view>
+            <view class="zan-capsule__right" style="color: #548B54 ; border-color: #548B54 ">{{ name }}</view>
+        </block>
+        <block wx:elif="{{color == 4}}">
+            <view class="zan-capsule__left" style="background: #B22222 ; border-color: #B22222 ">{{ cost }}</view>
+            <view class="zan-capsule__right" style="color: #B22222 ; border-color: #B22222 ">{{ name }}</view>
+        </block>
+        <block wx:elif="{{color == 5}}">
+            <view class="zan-capsule__left" style="background: #473C8B ; border-color: #473C8B ">{{ cost }}</view>
+            <view class="zan-capsule__right" style="color: #473C8B ; border-color: #473C8B ">{{ name }}</view>
+        </block> -->
     </view>
 </template>

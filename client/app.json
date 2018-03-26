@@ -1,14 +1,13 @@
 {
     "pages": [
         "pages/index/index",
-        "pages/logs/logs",
         "pages/game/game",
         "pages/newroom/newroom"
     ],
     "window": {
         "backgroundTextStyle": "light",
         "navigationBarBackgroundColor": "#fff",
-        "navigationBarTitleText": "WeChat",
+        "navigationBarTitleText": "富饶之城",
         "navigationBarTextStyle": "black"
     }
 }

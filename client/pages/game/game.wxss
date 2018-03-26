@@ -47,3 +47,34 @@
 	font-size: 14px;
 	color: #7a7a7a;
 }
+
+
+.card-btn-color-1 {
+    color: #fff;
+    background-color: #DAA520;
+    border-color: #DAA520;
+}
+
+.card-btn-color-2 {
+    color: #fff;
+    background-color: #4A708B;
+    border-color: #4A708B;
+}
+
+.card-btn-color-3 {
+    color: #fff;
+    background-color: #548B54;
+    border-color: #548B54;
+}
+
+.card-btn-color-4 {
+    color: #fff;
+    background-color: #B22222;
+    border-color: #B22222;
+}
+
+.card-btn-color-5 {
+    color: #fff;
+    background-color: #473C8B;
+    border-color: #473C8B;
+}

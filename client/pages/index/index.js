@@ -45,12 +45,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 		//console.log('[zan:field:blur]', componentId, detail);
 	},
 
-	//事件处理函数
-	bindViewTap: function () {
-		wx.navigateTo({
-			url: '../logs/logs'
-		})
-	},
+	
 	onLoad: function (options) {
 		var _this = this;
 
@@ -62,6 +57,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
 			app.globalData.uid = MD5.md5(app.globalData.userInfo);
 			console.log(app.globalData.userInfo);
+			console.log(app.globalData.uid);
 			this.queryEntryAndEnableBtn();
 		} else if (this.data.canIUse) {
 			// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
@@ -74,6 +70,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 				//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
 				app.globalData.uid = MD5.md5(app.globalData.userInfo);
 				console.log(app.globalData.userInfo);
+				console.log(app.globalData.uid);
 				this.queryEntryAndEnableBtn();
 			}
 		} else {
@@ -90,21 +87,22 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
 			app.globalData.uid = MD5.md5(app.globalData.userInfo);
 			console.log(app.globalData.userInfo);
+			console.log(app.globalData.uid);
 			this.queryEntryAndEnableBtn();
 		}
 
-
+		
 
 	},
 
-/**
- * 自动0.0.11.2版本开始，就不再在index页面查询connector了。
- * 因为connector可以直接写死，就是 域名+目录，然后服务器端nginx将其代理到不同的pomelo端口中。
- * 这样搞的原因是：微信小程序只允许通过wss（TLS）访问已备案域名，且不能带端口号，只能用默认的443端口。
- */
+	/**
+	 * 自动0.0.11.2版本开始，就不再在index页面查询connector了。
+	 * 因为connector可以直接写死，就是 域名+目录，然后服务器端nginx将其代理到不同的pomelo端口中。
+	 * 这样搞的原因是：微信小程序只允许通过wss（TLS）访问已备案域名，且不能带端口号，只能用默认的443端口。
+	 */
 	queryEntryAndEnableBtn() {
 		var _this = this;
-		
+
 		//激活按钮
 		_this.setData({
 			btn_disabled: false
@@ -172,6 +170,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 	//进入房间
 	enterRoom: function () {
 		var _this = this;
+		pomelo.disconnect();
 		wx.navigateTo({
 			url: '../game/game?roomId=' + Number(_this.data.roomId) + '&passwd=' + _this.data.passwd,
 		})
