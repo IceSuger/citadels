@@ -153,6 +153,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		// wx.setNavigationBarTitle({
 		// 	title: '房间 ' + options.roomId,
 		// })
+
+
+
+		this.enterRoom(options);
+	},
+
+	pomeloAddListeners() {
+		var _this = this;
 		//先注册监听房间成员变化的事件
 		pomelo.on('roomMemberChange', function (msg) {
 			// console.log('roomMemberChange' + msg);
@@ -251,9 +259,21 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				logs: logs
 			})
 		});
-
-
-		this.enterRoom(options);
+		//监听掉线
+		pomelo.on('disconnect', function () {
+			if (!_this.data.activeDisconnect) {
+				console.log('掉线了');
+				_this.ask4Reconnect();
+				//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+				app.globalData.disconnected = true;
+			}
+		});
+		pomelo.on('heartbeat timeout', function () {
+			console.log('心跳超时');
+			_this.ask4Reconnect();
+			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+			app.globalData.disconnected = true;
+		});
 	},
 
 	ask4Reconnect() {
@@ -491,8 +511,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			// port: '/conn/', //小程序不允许带端口号，只能用默认443.所以这里通过目录，在服务器上用nginx反向代理实现将请求转发到不同端口上。
 			log: true,
 		}, function () {
-			//标记一下，当前连上了（用于断线重连相关逻辑）
-			app.globalData.disconnected = false;
+			
 
 			var route = "connector.entryHandler.enterRoom";
 			var enterRoomParam = {
@@ -511,6 +530,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				// 	//this.showZanTopTips('房间已存在');
 				// 	return;
 				// }
+				//标记一下，当前连上了（用于断线重连相关逻辑）
+				app.globalData.disconnected = false;
+				
 				if (data.retmsg.code === consts.ENTER_ROOM.OK) {
 					console.log(data);
 					_this.setData({
@@ -522,21 +544,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 					// _this.setData({
 					// 	roomId: data.roomId
 					// });
-					//监听掉线
-					pomelo.on('disconnect', function () {
-						if (!_this.data.activeDisconnect) {
-							console.log('掉线了');
-							_this.ask4Reconnect();
-							//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-							app.globalData.disconnected = true;
-						}
-					});
-					pomelo.on('heartbeat timeout', function () {
-						console.log('心跳超时');
-						_this.ask4Reconnect();
-						//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-						app.globalData.disconnected = true;
-					});
+					_this.pomeloAddListeners();
 				}
 				else if (app.globalData.disconnected === true) {
 					_this.ask4Reconnect();
