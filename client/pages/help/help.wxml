@@ -1,0 +1,276 @@
+<!--pages/help/help.wxml-->
+<import src="/zanui/tab/index.wxml" />
+
+<view style="margin: 0px 0">
+    <template is="zan-tab" data="{{tab: tabInHelp, componentId: 'tabInHelp'}}"></template>
+</view>
+<view hidden="{{tabInHelp.selectedId != 'rule'}}">
+
+    <view class="zan-cell">
+        <view class="zan-cell__bd">
+            <view class="zan-font-16 zan-font-bold">皇冠：</view>
+            <text class="zan-font-14">
+					拥有皇冠的玩家将是第一个选角色的人。每轮的“国王”玩家将拥有下一轮的皇冠。
+					</text>
+        </view>
+    </view>
+
+    <view class="zan-cell">
+        <view class="zan-cell__bd">
+            <view class="zan-font-16 zan-font-bold">游戏准备：</view>
+            <text class="zan-font-14">
+					游戏开始前将做如下准备（系统自动完成）：
+					1.将8张角色牌洗好；
+					2.将建筑牌洗好；
+					3.给每个玩家发2枚金币；
+					4.给每个玩家发4张建筑牌；
+					5.随机选一个玩家作为皇冠拥有者，第一轮的角色挑选将从这名玩家开始。
+					</text>
+        </view>
+    </view>
+
+    <view class="zan-cell">
+        <view class="zan-cell__bd">
+            <view class="zan-font-16 zan-font-bold">游戏流程：</view>
+            <text class="zan-font-14">
+					目前只支持4~6人在基础包上游戏。未来会加入2、3、7人游戏的逻辑以及扩展包的角色和建筑，敬请期待。
+					游戏将会进行数轮，每轮有四个阶段。
+
+					</text>
+            <view class="zan-font-14 zan-font-bold">第一阶段（系统自动完成）：丢弃角色</view>
+            <text class="zan-font-14">
+					从角色牌堆中随机选一张丢弃，所有人都不知道这张牌是什么；再随机选出若干张角色牌丢弃并翻开，所有玩家都将得知这些角色是什么。最后剩下比玩家人数多1的角色牌供玩家从中选择。
+					注意：如果国王是牌面向上被丢弃的，则需要再随机选一张来代替国王被丢弃。
+
+					</text>
+
+            <view class="zan-font-14 zan-font-bold">第二阶段：选择角色</view>
+            <text class="zan-font-14">
+					从拥有皇冠的玩家开始，从候选角色牌中选取自己本轮的角色，然后将剩余的角色牌传给下一名玩家，直到所有玩家都完成了选择，将最后一张没人选的牌，面向下丢弃（没有人知道它是什么）。
+
+					</text>
+
+            <view class="zan-font-14 zan-font-bold">第三阶段：行动回合</view>
+            <text class="zan-font-14">
+					从1号角色（刺客）开始按照角色的编号顺序依次进行自己的行动回合，即轮到自己的角色行动时，自己才表明自己的角色身份并进行行动。如果按顺序进行时，某个角色没有被玩家选择或某个角色被刺客刺杀了，则相应角色的回合将被跳过。行动回合具体说明如下：
+					1. 在自己的行动回合中，你需要先“拿取2金币”或“摸2张建筑牌，选1张加入手牌”，然后可以建造1个建筑；
+					2. 建造建筑：你可以花费一定的金币，将你的一张手牌代表的建筑建造出来，花费的金币数都已经在建筑牌上以“X费”的形式标出；
+					3. 你的城市中不能同时有2个及以上的相同建筑；
+					4. 每个角色都有自己的技能，在你的行动回合中，你的角色的每个技能都只能至多使用一次，但使用的时机可以在你的行动回合内任意选择；
+					5. 国王、主教、商人、军阀，分别拥有对贵族地区、宗教地图、商业地图、军事地图收税的权利，你城市中每个你可收税的建筑都能为你额外带来1金币收入，你可以在行动回合内的任意时间对你的城市进行一次（仅一次）收税。
+
+					</text>
+
+            <view class="zan-font-14 zan-font-bold">第四阶段（系统自动完成）：回合结束</view>
+            <text class="zan-font-14">
+					当所有角色的行动回合都结束后，本轮游戏结束，所有人交出自己的角色牌，重新回到第一阶段开始下一回合。
+
+					</text>
+
+            <view class="zan-font-14 zan-font-bold">游戏结束</view>
+            <text class="zan-font-14">
+					当有任何一位玩家建造满了8个建筑时，本局游戏便将在本轮游戏结束时结束。然后系统将计算每位玩家本局游戏的分数：
+					1.玩家获得的分数等于自己城市中全部建筑的建造费用（龙门、大学例外）；
+					2.玩家造满了5中颜色的建筑，将额外获得3分；
+					3.第一个造满8个建筑的玩家，将额外获得4分；
+					4.之后造满8个建筑的玩家，都将额外获得2分。
+
+					得分最高者即为胜利者。
+
+					</text>
+        </view>
+
+    </view>
+</view>
+<view hidden="{{tabInHelp.selectedId != 'cards'}}">
+    <view class="zan-cell">
+        <view class="zan-font-16 zan-font-bold">贵族地区</view>
+        <text class="zan-font-14">
+						以“贵”字标识，黄色。可为国王带来税收。
+					</text>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-font-16 zan-font-bold">宗教地区</view>
+        <text class="zan-font-14">
+						以“教”字标识，蓝色。可为国王带来税收。
+					</text>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-font-16 zan-font-bold">商业地区</view>
+        <text class="zan-font-14">
+						以“商”字标识，绿色。可为商人带来税收。
+					</text>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-font-16 zan-font-bold">军事地区</view>
+        <text class="zan-font-14">
+						以“军”字标识，红色。可为军阀带来税收。
+					</text>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-font-16 zan-font-bold">特殊建筑</view>
+        <text class="zan-font-14">
+						以“特”字标识，紫色。下面详述：
+					</text>
+    </view>
+
+    <view class="zan-cell">
+        <view class="zan-panel-title">龙门 6费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					游戏结束时，按8分计分。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">大学 6费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					游戏结束时，按8分计分。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">铁匠铺 5费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					可以花费2金币，摸取3张建筑牌到手牌中。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">实验室 5费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					可以丢弃1张手牌，获得1金币。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">墓地 5费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					军阀拆除建筑时，你可以花费1金币，将这张建筑回收至自己的手牌。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">魔法学校 6费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					收税时可以被指定为任一颜色。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">鬼城 2费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					游戏结束时，可以被指定为任一颜色来参与颜色统计。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">堡垒 3费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					无法被军阀拆除。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">长城 6费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					军阀拆你任一建筑时，需要多花1金币。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">天文台 5费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					行动回合中，如果你选择摸取建筑牌，你可以3张来供你挑选。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">图书馆 6费</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					行动回合中，如果你选择摸取建筑牌，你可以保留2张到手牌中。
+					</text>
+        </view>
+    </view>
+</view>
+<view hidden="{{tabInHelp.selectedId != 'roles'}}">
+    <view class="zan-cell">
+        <view class="zan-panel-title">1 刺客</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					主动：选择一名角色刺杀，被刺杀角色的本轮行动回合将被跳过。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">2 盗贼</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					主动：选择一名角色偷取其金币，其行动回合开始时进行结算。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">3 魔术师</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					主动：选择一名角色与其交换全部手牌，或选择与系统牌堆交换任意张手牌。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">4 国王</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					被动：获得皇冠，下一轮先选角色。
+					被动：可从贵族地区（黄色建筑）中获得税收。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">5 主教</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					被动：军阀不能拆除你的建筑。
+					被动：可以从宗教地区（蓝色建筑）中获得税收。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">6 商人</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					被动：回合开始时额外获得1金币。
+					被动：可以从商业地区（绿色建筑）中获得税收。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">7 建筑师</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					被动：回合开始时额外获得2张建筑牌。
+					被动：你的回合中可以建造3个建筑。
+					</text>
+        </view>
+    </view>
+    <view class="zan-cell">
+        <view class="zan-panel-title">8 军阀</view>
+        <view class="zan-cell__bd">
+            <text class="zan-font-14">
+					主动：选择一名玩家，花费金币拆除其一个建筑。花费金币数=建筑建造费用-1。
+					被动：可以从军事地区（红色建筑）中获得税收。
+					</text>
+        </view>
+    </view>
+</view>

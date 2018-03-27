@@ -166,7 +166,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
 			wx.setNavigationBarTitle({
-				title: `房间 ${options.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
+				title: `房间 ${app.globalData.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
 			})
 		});
 		pomelo.on('roomReadyChange', function (msg) {
@@ -275,7 +275,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			app.globalData.disconnected = true;
 		});
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
-		pomelo.on('onReconnect', function(msg){
+		pomelo.on('onReconnect', function (msg) {
 			_this.setData({
 				logs: msg.logs
 			})
@@ -352,7 +352,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			//选角色相关
 			pickableRoleList: [],
 			bannedAndShownRoleList: [],
-			roleIdPicked: null,
+			// roleIdPicked: null,
 			mePickingRole: false,
 			//可执行动作列表
 			actionList: null,
@@ -554,11 +554,11 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		app.globalData.roomId = roomId;
 		app.globalData.passwd = passwd;
 
-		if(!app.globalData.disconnected) {
+		if (!app.globalData.disconnected) {
 			//若这是首次连接，而非断线重连，则增加对各种pomelo.on的监听
 			_this.pomeloAddListeners();
 		}
-		
+
 		pomelo.init({
 			host: app.globalData.conn_host,	//connector的host和port
 			port: app.globalData.conn_port,
@@ -599,23 +599,23 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 					wx.setNavigationBarTitle({
 						title: `房间 ${options.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
 					})
-					
+
 					// if (!app.globalData.disconnected) {
 					// 	//若这是首次连接，而非断线重连，则增加对各种pomelo.on的监听
 					// 	_this.pomeloAddListeners();
 					// }
 					//标记一下，当前连上了（用于断线重连相关逻辑）
 					app.globalData.disconnected = false;
-				// }
-				// else if (app.globalData.disconnected === true) {
-				// 	_this.ask4Reconnect();
+					// }
+					// else if (app.globalData.disconnected === true) {
+					// 	_this.ask4Reconnect();
 				} else {
 					app.globalData.errorCode = data.retmsg.code;
 					wx.navigateBack({
 						//url: '../index/index?code=' + data.retmsg.code,
 					})
 				}
-				
+
 			});
 		});
 	},
@@ -1484,10 +1484,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	handleZanTabChange(e) {
 		var componentId = e.componentId;
 		var selectedId = e.selectedId;
-
-		this.setData({
-			[`${componentId}.selectedId`]: selectedId
-		});
+		// console.log(selectedId);
+		if (selectedId !== 'help') {
+			//点的不是帮助页
+			this.setData({
+				[`${componentId}.selectedId`]: selectedId
+			});
+		} else {
+			//点了帮助页，那就调到单独的页面里
+			wx.navigateTo({
+				url: '../help/help'
+			})
+		}
 	},
 
 	handleZanSelectChange({ componentId, value }) {

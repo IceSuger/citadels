@@ -2,7 +2,8 @@
     "pages": [
         "pages/index/index",
         "pages/game/game",
-        "pages/newroom/newroom"
+        "pages/newroom/newroom",
+        "pages/help/help"
     ],
     "window": {
         "backgroundTextStyle": "light",
