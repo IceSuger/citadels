@@ -16,7 +16,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		gameOver: false,
 		consts: consts,
 		noticeBar: {
-			text: '澳门首家线上富饶之城开业啦！屠龙宝刀，点击就送！',
+			text: '感谢您使用本桌游助手！',
 		},
 		tab: {
 			list: [{

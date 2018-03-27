@@ -1,6 +1,7 @@
 <import src="/zanui/field/index.wxml" />
 <import src="/zanui/toptips/index.wxml" />
 <!--index.wxml-->
+<text class="zan-font-12">请注意：这不是在线游戏，而仅仅是辅助您和朋友进行桌游“富饶之城”的小助手，可以用于角色分配、发牌、自动计分。</text>
 <view class="container">
     <view class="userinfo">
         <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 先点我登录 </button>
@@ -16,5 +17,6 @@
 
     <button class="zan-btn zan-btn--primary " bindtap='enterRoom' disabled='{{btn_disabled}}'>进入房间</button>
     <button class="zan-btn zan-btn--warn " bindtap='createRoom' disabled='{{btn_disabled}}'>新建房间</button>
+	<button class="zan-btn" bindtap='showHelp' >查看桌游规则</button>
 	<template is="zan-toptips" data="{{ zanTopTips }}"></template>
 </view>

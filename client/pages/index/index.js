@@ -180,5 +180,11 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 		wx.navigateTo({
 			url: '../newroom/newroom'
 		})
+	},
+	//查看规则
+	showHelp: function(){
+		wx.navigateTo({
+			url: '../help/help',
+		})
 	}
 }));
