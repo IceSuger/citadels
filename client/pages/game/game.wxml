@@ -151,13 +151,13 @@
 
     </block>
     <!-- 有主动技能的建筑 -->
-    <block wx:if="{{myRoundNow && iHaveSmithy}}">
+    <block wx:if="{{myRoundNow && iHaveSmithy && !smithyUsed}}">
         <view class="zan-panel-title">铁匠铺技能</view>
         <view class="zan-panel">
             <button class="zan-btn card-btn-color-5" bindtap="smithy">支付2金币，摸3张建筑牌</button>
         </view>
     </block>
-    <block wx:if="{{myRoundNow && iHaveLab}}">
+    <block wx:if="{{myRoundNow && iHaveLab && !labUsed}}">
         <view class="zan-panel-title">实验室技能</view>
         <view class="zan-panel">
             <button class="zan-btn card-btn-color-5" bindtap="laboratory">丢弃1张手牌，获得1金币</button>

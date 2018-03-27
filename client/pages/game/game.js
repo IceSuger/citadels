@@ -102,6 +102,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		iHaveSmithy: false,
 		//我有实验室
 		iHaveLab: false,
+		smithyUsed: false,
+		labUsed: false,
 
 		//墓地中待回收的卡
 		cemeteryCard: null,
@@ -277,7 +279,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
 			_this.setData({
-				logs: msg.logs
+				logs: msg.logs,
+				gameOn: true
 			})
 			_this.updatePlayers(msg.playerDict);
 		})
@@ -380,6 +383,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			iHaveSmithy: false,
 			//我有实验室
 			iHaveLab: false,
+			smithyUsed: false,
+			labUsed: false,
+
 			//墓地中待回收的卡
 			cemeteryCard: null,
 		})
@@ -1353,7 +1359,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			this.showError("金币不足，无法发动技能。");
 		}
 		this.setData({
-			iHaveSmithy: false
+			smithyUsed: true
 		})
 	},
 
@@ -1414,7 +1420,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		}
 		pomelo.request("core.coreHandler.laboratory", msg, null);
 		this.setData({
-			iHaveLab: false,
+			labUsed: true,
 			laboratoryDiscardingCards: false
 		})
 	},
