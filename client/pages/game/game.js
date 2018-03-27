@@ -279,7 +279,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
 			_this.setData({
-				logs: msg.logs,
+				// logs: msg.logs,
 				gameOn: true
 			})
 			_this.updatePlayers(msg.playerDict);
