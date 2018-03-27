@@ -261,7 +261,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 		//监听掉线
 		pomelo.on('disconnect', function () {
-			if (!_this.data.activeDisconnect) {
+			if (!_this.data.userForceDisconnect) {
 				console.log('掉线了');
 				_this.ask4Reconnect();
 				//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
@@ -274,6 +274,13 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
 			app.globalData.disconnected = true;
 		});
+		//监听重连后单点收到的消息（本局游戏历史和当前局势）
+		pomelo.on('onReconnect', function(msg){
+			_this.setData({
+				logs: msg.logs
+			})
+			_this.updatePlayers(msg.playerDict);
+		})
 	},
 
 	ask4Reconnect() {
@@ -321,7 +328,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	},
 
 	/**
-	 * 目前是，服务器上每次开始新一轮选角色时，发出这个消息。
+	 * 开始选人、开始行动，都会触发这个。
 	 */
 	gameStateChange(msg) {
 		this.setData({
@@ -334,8 +341,50 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				[`playerList[${index}].roleName_zh`]: this.data.roles[0].name_zh
 			})
 		})
-
+		//重置move页
+		this.resetTabMove();
 	},
+
+	resetTabMove() {
+		this.setData({
+			pickableRoleList: [],
+			pickableCardCnt: null,
+			//选角色相关
+			pickableRoleList: [],
+			bannedAndShownRoleList: [],
+			roleIdPicked: null,
+			mePickingRole: false,
+			//可执行动作列表
+			actionList: null,
+			meTakingCoinOrCard: false,
+			//从牌堆摸牌后的候选牌列表：
+			candidateCardList: [],
+			//从牌堆摸牌后，可以保留几张加入手牌
+			pickableCardCnt: null,
+			//本轮已知角色的玩家列表（元素为seatId）
+			knownRolePlayers: [],
+			//我可以发动角色技能吗
+			roleAbilityUsable: false,
+			//我场上的建筑带有的主动技能
+			buildingAbilitys: false,
+			//我现在可以结束我的回合
+			myRoundNow: false,
+			//我正在进行建造
+			meDoingBuild: false,
+			//正在选择主动技能针对的目标玩家
+			mePickingTargetPlayer: false,
+			//我本回合是否还能收税
+			canTakeTax: true,
+
+			//我有铁匠铺
+			iHaveSmithy: false,
+			//我有实验室
+			iHaveLab: false,
+			//墓地中待回收的卡
+			cemeteryCard: null,
+		})
+	},
+
 
 	showCurMove(msg) {
 		var _this = this;
@@ -388,7 +437,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	onUnload: function () {
 		//打标记：这是用户主动断开的连接
 		this.setData({
-			activeDisconnect: true
+			userForceDisconnect: true
 		})
 		pomelo.disconnect();
 	},
@@ -505,13 +554,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		app.globalData.roomId = roomId;
 		app.globalData.passwd = passwd;
 
+		if(!app.globalData.disconnected) {
+			//若这是首次连接，而非断线重连，则增加对各种pomelo.on的监听
+			_this.pomeloAddListeners();
+		}
+		
 		pomelo.init({
 			host: app.globalData.conn_host,	//connector的host和port
 			port: app.globalData.conn_port,
 			// port: '/conn/', //小程序不允许带端口号，只能用默认443.所以这里通过目录，在服务器上用nginx反向代理实现将请求转发到不同端口上。
 			log: true,
 		}, function () {
-			
+
 
 			var route = "connector.entryHandler.enterRoom";
 			var enterRoomParam = {
@@ -525,14 +579,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 
 			pomelo.request(route, enterRoomParam, function (data) {
-				// if (data.error == 1) {
-				// 	//提示房间已存在
-				// 	//this.showZanTopTips('房间已存在');
-				// 	return;
-				// }
-				//标记一下，当前连上了（用于断线重连相关逻辑）
-				app.globalData.disconnected = false;
-				
+				//先将用户主动断开连接的标记置否
+				_this.setData({
+					userForceDisconnect: false
+				});
+				//若本次是断线后重连的
+				if (app.globalData.disconnected) {
+					_this.setData({
+						gameOn: true
+					})
+				}
+
+
 				if (data.retmsg.code === consts.ENTER_ROOM.OK) {
 					console.log(data);
 					_this.setData({
@@ -541,19 +599,23 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 					wx.setNavigationBarTitle({
 						title: `房间 ${options.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
 					})
-					// _this.setData({
-					// 	roomId: data.roomId
-					// });
-					_this.pomeloAddListeners();
-				}
-				else if (app.globalData.disconnected === true) {
-					_this.ask4Reconnect();
+					
+					// if (!app.globalData.disconnected) {
+					// 	//若这是首次连接，而非断线重连，则增加对各种pomelo.on的监听
+					// 	_this.pomeloAddListeners();
+					// }
+					//标记一下，当前连上了（用于断线重连相关逻辑）
+					app.globalData.disconnected = false;
+				// }
+				// else if (app.globalData.disconnected === true) {
+				// 	_this.ask4Reconnect();
 				} else {
 					app.globalData.errorCode = data.retmsg.code;
 					wx.navigateBack({
 						//url: '../index/index?code=' + data.retmsg.code,
 					})
 				}
+				
 			});
 		});
 	},
@@ -1412,6 +1474,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		_this.setData({
 			myRoundNow: false
 		})
+		_this.switchToTab('situation');
 	},
 
 	/**

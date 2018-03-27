@@ -110,7 +110,7 @@
             </view>
         </view>
     </block>
-    <block wx:elif="{{mePickingBuildingCard}}">
+    <block wx:elif="{{myRoundNow && mePickingBuildingCard}}">
         <view class="zan-panel-title">选择{{pickableCardCnt}}张建筑牌加入手牌</view>
         <view class="zan-panel">
             <view>
@@ -121,7 +121,7 @@
         </view>
     </block>
     <!-- 可执行行动列表 -->
-    <block wx:elif="{{meTakingCoinOrCard}}">
+    <block wx:elif="{{myRoundNow && meTakingCoinOrCard}}">
         <view class="zan-panel-title">当前可执行的动作</view>
         <view class="zan-panel">
             <view>
@@ -132,7 +132,7 @@
         </view>
     </block>
     <!-- 可 对角色 使用的角色主动技能 -->
-    <block wx:if="{{roleAbilityUsable && (myRoleId === consts.ROLES.ASSASSIN || myRoleId === consts.ROLES.THIEF) }}">
+    <block wx:if="{{myRoundNow && roleAbilityUsable && (myRoleId === consts.ROLES.ASSASSIN || myRoleId === consts.ROLES.THIEF) }}">
         <view class="zan-panel-title">角色主动技能</view>
 
         <!-- 选择目标角色 WeUI -->
@@ -144,20 +144,20 @@
 
     </block>
     <!-- 可 对玩家 使用的角色主动技能 -->
-    <block wx:if="{{roleAbilityUsable && (myRoleId === consts.ROLES.MAGICIAN || myRoleId === consts.ROLES.WARLORD) }}">
+    <block wx:if="{{myRoundNow && roleAbilityUsable && (myRoleId === consts.ROLES.MAGICIAN || myRoleId === consts.ROLES.WARLORD) }}">
         <view class="zan-panel-title">角色主动技能</view>
 
         <button class="zan-btn zan-btn--warn" bindtap="useAbilityOnPlayerOrSys">{{roles[ myRoleId ].ability_zh}}</button>
 
     </block>
     <!-- 有主动技能的建筑 -->
-    <block wx:if="{{iHaveSmithy}}">
+    <block wx:if="{{myRoundNow && iHaveSmithy}}">
         <view class="zan-panel-title">铁匠铺技能</view>
         <view class="zan-panel">
             <button class="zan-btn card-btn-color-5" bindtap="smithy">支付2金币，摸3张建筑牌</button>
         </view>
     </block>
-    <block wx:if="{{iHaveLab}}">
+    <block wx:if="{{myRoundNow && iHaveLab}}">
         <view class="zan-panel-title">实验室技能</view>
         <view class="zan-panel">
             <button class="zan-btn card-btn-color-5" bindtap="laboratory">丢弃1张手牌，获得1金币</button>
