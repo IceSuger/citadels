@@ -137,7 +137,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 		app.globalData.userInfo = e.detail.userInfo
 		this.setData({
 			userInfo: e.detail.userInfo,
-			hasUserInfo: true
+			hasUserInfo: true,
+			btn_disabled: false
 		})
 	},
 

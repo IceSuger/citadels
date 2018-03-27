@@ -303,7 +303,12 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 						passwd: app.globalData.passwd
 					});
 				} else {
-					console.log('用户拒绝重连。')
+					console.log('用户拒绝重连。');
+					//用户拒绝重连，则清空有房间可重连的信息。如果用户还想重连回去，则输入房间号重连即可。
+					app.globalData.disconnected = false;
+					wx.navigateBack({
+						
+					})
 				}
 			}
 		});
