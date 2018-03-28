@@ -48,6 +48,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 	
 	onLoad: function (options) {
 		var _this = this;
+		// console.log('MD5');
+		// console.log(MD5.md5(null));
 
 		if (app.globalData.userInfo) {
 			this.setData({
@@ -58,7 +60,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 			app.globalData.uid = MD5.md5(app.globalData.userInfo);
 			console.log(app.globalData.userInfo);
 			console.log(app.globalData.uid);
-			this.queryEntryAndEnableBtn();
+			this.enableBtn();
 		} else if (this.data.canIUse) {
 			// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
 			// 所以此处加入 callback 以防止这种情况
@@ -71,7 +73,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 				app.globalData.uid = MD5.md5(app.globalData.userInfo);
 				console.log(app.globalData.userInfo);
 				console.log(app.globalData.uid);
-				this.queryEntryAndEnableBtn();
+				this.enableBtn();
 			}
 		} else {
 			// 在没有 open-type=getUserInfo 版本的兼容处理
@@ -82,13 +84,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 						userInfo: res.userInfo,
 						hasUserInfo: true
 					})
+					//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+					app.globalData.uid = MD5.md5(app.globalData.userInfo);
+					console.log(app.globalData.userInfo);
+					console.log(app.globalData.uid);
+					this.enableBtn();
 				}
 			})
-			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
-			app.globalData.uid = MD5.md5(app.globalData.userInfo);
-			console.log(app.globalData.userInfo);
-			console.log(app.globalData.uid);
-			this.queryEntryAndEnableBtn();
+			
 		}
 
 		
@@ -100,7 +103,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 	 * 因为connector可以直接写死，就是 域名+目录，然后服务器端nginx将其代理到不同的pomelo端口中。
 	 * 这样搞的原因是：微信小程序只允许通过wss（TLS）访问已备案域名，且不能带端口号，只能用默认的443端口。
 	 */
-	queryEntryAndEnableBtn() {
+	enableBtn() {
 		var _this = this;
 
 		//激活按钮
@@ -134,11 +137,27 @@ Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 
 	getUserInfo: function (e) {
 		console.log(e)
-		app.globalData.userInfo = e.detail.userInfo
-		this.setData({
-			userInfo: e.detail.userInfo,
-			hasUserInfo: true,
-			btn_disabled: false
+		// app.globalData.userInfo = e.detail.userInfo
+		// this.setData({
+		// 	userInfo: e.detail.userInfo,
+		// 	hasUserInfo: true,
+		// 	btn_disabled: false
+		// })
+
+		
+		wx.getUserInfo({
+			success: res => {
+				app.globalData.userInfo = res.userInfo
+				this.setData({
+					userInfo: res.userInfo,
+					hasUserInfo: true
+				})
+				//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+				app.globalData.uid = MD5.md5(app.globalData.userInfo);
+				console.log(app.globalData.userInfo);
+				console.log(app.globalData.uid);
+				this.enableBtn();
+			}
 		})
 	},
 

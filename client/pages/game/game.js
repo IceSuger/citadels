@@ -163,6 +163,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 	pomeloAddListeners() {
 		var _this = this;
+		pomelo.removeAllListeners();
 		//先注册监听房间成员变化的事件
 		pomelo.on('roomMemberChange', function (msg) {
 			// console.log('roomMemberChange' + msg);
@@ -250,6 +251,12 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				_this.showNews("军阀请继续行动。");
 			}
 		});
+		//监听刺客刺杀了谁，主要用于盗贼行动可行性的判断
+		pomelo.on('onRoleKilled', (msg)=>{
+			_this.setData({
+				roleIdKilled: msg.roleIdKilled
+			})
+		});
 		//监听日志到来
 		pomelo.on('onLog', (msg) => {
 			// console.log(msg);
@@ -263,6 +270,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 		//监听掉线
 		pomelo.on('disconnect', function () {
+			_this.showError("掉线了卧槽");
 			if (!_this.data.userForceDisconnect) {
 				console.log('掉线了');
 				_this.ask4Reconnect();
@@ -272,12 +280,14 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 		pomelo.on('heartbeat timeout', function () {
 			console.log('心跳超时');
-			_this.ask4Reconnect();
-			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-			app.globalData.disconnected = true;
+			_this.showError("心跳超时");
+			// _this.ask4Reconnect();
+			// //置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+			// app.globalData.disconnected = true;
 		});
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
+			_this.showNews('重连了卧槽！!！');
 			_this.setData({
 				// logs: msg.logs,
 				gameOn: true
@@ -291,7 +301,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		//弹窗，问是否重连
 		wx.showModal({
 			title: '是否重连',
-			content: '与服务器断开了连接，是否重连？',
+			content: '骂的。与服务器断开了连接，是否重连？',
 			confirmText: "是",
 			cancelText: "否",
 			success: function (res) {
@@ -305,10 +315,17 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				} else {
 					console.log('用户拒绝重连。');
 					//用户拒绝重连，则清空有房间可重连的信息。如果用户还想重连回去，则输入房间号重连即可。
-					app.globalData.disconnected = false;
-					wx.navigateBack({
-						
+					_this.setData({
+						userForceDisconnect: true
 					})
+					app.globalData.disconnected = false;
+					if(!_this.data.gameOn){
+						//若游戏没在进行中，就退出本页面
+						wx.navigateBack({
+
+						})
+					}
+					
 				}
 			}
 		});
@@ -429,10 +446,10 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	onShow: function () {
 		// 滚动通告栏需要initScroll
 		this.initZanNoticeBarScroll('noticeBar');
-		//判断是否已断线，若是，则询问是否重连
-		if (app.globalData.disconnected === true) {
-			this.ask4Reconnect();
-		}
+		// //判断是否已断线，若是，则询问是否重连
+		// if (app.globalData.disconnected === true) {
+		// 	this.ask4Reconnect();
+		// }
 	},
 
 	/**
@@ -483,7 +500,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			var playerObj = playerDict[uid];
 			playerObj['buildingList'] = [];
 			for (let building in playerObj['buildingDict']) {
-				console.log(building);
+				// console.log(building);
 				playerObj['buildingList'].push(_this.data.staticBuildingDict[building]);
 			}
 			//增加一些用于本地显示的属性
@@ -501,6 +518,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			} else {
 				playerObj.roleName_zh = _this.data.roles[0].name_zh;
 			}
+
+			//如果该角色被杀了，则赋值 roleIdKilled
+			if(playerObj.killed)
 
 			// //把已建造的（建筑牌id）映射成建筑牌对象
 			// var handCardObjs = [];
@@ -594,15 +614,15 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				_this.setData({
 					userForceDisconnect: false
 				});
-				//若本次是断线后重连的
-				if (app.globalData.disconnected) {
-					_this.setData({
-						gameOn: true
-					})
-				}
+				// //若本次是断线后重连的
+				// if (app.globalData.disconnected) {
+				// 	_this.setData({
+				// 		gameOn: true
+				// 	})
+				// }
 
-
-				if (data.retmsg.code === consts.ENTER_ROOM.OK) {
+				console.log(data);
+				if (Number(data.retmsg.code) === consts.ENTER_ROOM.OK) {
 					console.log(data);
 					_this.setData({
 						roomMemberMax: data.retmsg.roomMemberMax

@@ -43,6 +43,7 @@ App({
 	//小程序不允许带端口号，只能用默认443.所以这里通过目录，在服务器上用nginx反向代理实现将请求转发到不同端口上。
 	conn_port: '/conn/',	//pomelo connector port 
 	errorCode: null,
+	disconnected: false
   },
   config: {
     // host: '123.56.1.58',
