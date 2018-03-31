@@ -168,6 +168,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		pomelo.on('roomMemberChange', function (msg) {
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
+			_this.showError('更新标题！');
 			wx.setNavigationBarTitle({
 				title: `房间 ${app.globalData.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
 			})
@@ -270,7 +271,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 		//监听掉线
 		pomelo.on('disconnect', function () {
-			_this.showError("掉线了卧槽");
+			_this.showError("掉线了啊啊");
 			if (!_this.data.userForceDisconnect) {
 				console.log('掉线了');
 				_this.ask4Reconnect();
@@ -287,7 +288,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
-			_this.showNews('重连了卧槽！!！');
+			_this.showNews('重连了！!！');
 			_this.setData({
 				// logs: msg.logs,
 				gameOn: true
@@ -301,7 +302,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		//弹窗，问是否重连
 		wx.showModal({
 			title: '是否重连',
-			content: '骂的。与服务器断开了连接，是否重连？',
+			content: '与服务器断开了连接，是否重连？',
 			confirmText: "是",
 			cancelText: "否",
 			success: function (res) {
@@ -496,6 +497,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 		//把收到的dict转为本地的list
 		var playerList = [];
+		console.log('playerDict!!');
+		console.log(playerDict);
 		for (let uid in playerDict) {
 			var playerObj = playerDict[uid];
 			playerObj['buildingList'] = [];
@@ -519,8 +522,12 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				playerObj.roleName_zh = _this.data.roles[0].name_zh;
 			}
 
-			//如果该角色被杀了，则赋值 roleIdKilled
-			if(playerObj.killed)
+			// //如果该角色被杀了，则赋值 roleIdKilled
+			// if(_this.data.roles[playerObj.role].killed){
+			// 	_this.setData({
+			// 		roleIdKilled: playerObj.role
+			// 	})
+			// }
 
 			// //把已建造的（建筑牌id）映射成建筑牌对象
 			// var handCardObjs = [];
@@ -574,6 +581,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			roomMemberCnt: playerList.length,
 			handCards: handCardObjs
 		})
+		console.log('playerList!');
 		console.log(playerList);
 	},
 
@@ -763,9 +771,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			// // _this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
 			// _this.showNews('请等待玩家 ' + curPlayerName + ' 选角色...');
 		}
-		var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
-		// _this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
-		_this.showNews('请等待玩家 ' + curPlayerName + ' 选角色...');
+		// var curPlayerName = _this.data.playerList[curPlayer].wxNickName;
+		// // _this.showError('请等待玩家 ' + curPlayerName + ' 选角色...');
+		// _this.showNews('请等待玩家 ' + curPlayerName + ' 选角色...');
 	},
 
 	onTakingAction(msg) {
