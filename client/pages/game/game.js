@@ -168,7 +168,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		pomelo.on('roomMemberChange', function (msg) {
 			// console.log('roomMemberChange' + msg);
 			_this.updatePlayers(msg.playerDict);
-			_this.showError('更新标题！');
+			// _this.showError('更新标题！');
 			wx.setNavigationBarTitle({
 				title: `房间 ${app.globalData.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
 			})
@@ -411,6 +411,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 			//墓地中待回收的卡
 			cemeteryCard: null,
+			roleIdKilled: null,
 		})
 	},
 
