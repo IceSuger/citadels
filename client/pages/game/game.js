@@ -269,23 +269,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				logs: logs
 			})
 		});
-		//监听掉线
-		pomelo.on('disconnect', function () {
-			_this.showError("掉线了啊啊");
-			if (!_this.data.userForceDisconnect) {
-				console.log('掉线了');
-				_this.ask4Reconnect();
-				//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-				app.globalData.disconnected = true;
-			}
-		});
-		pomelo.on('heartbeat timeout', function () {
-			console.log('心跳超时');
-			_this.showError("心跳超时");
-			// _this.ask4Reconnect();
-			// //置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-			// app.globalData.disconnected = true;
-		});
+		
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
 			_this.showNews('重连了！!！');
@@ -343,7 +327,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		// })
 		var roles = this.data.roles;
 		roles.forEach(function (role, index, _) {
-			console.log(index);
+			// console.log(index);
 			if (index !== 0) {
 				roleNames.push(`${index}  ${role.name_zh}`);
 			}
@@ -632,6 +616,13 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 				console.log(data);
 				if (Number(data.retmsg.code) === consts.ENTER_ROOM.OK) {
+					//加入对掉线事件的监听
+					pomelo.removeListener('disconnect', _this.disconnectListener);
+					pomelo.removeListener('heartbeat timeout', _this.heartBeatTimeoutListener);
+					//监听掉线
+					pomelo.on('disconnect', _this.disconnectListener);
+					pomelo.on('heartbeat timeout', _this.heartBeatTimeoutListener);
+
 					console.log(data);
 					_this.setData({
 						roomMemberMax: data.retmsg.roomMemberMax
@@ -658,6 +649,26 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 			});
 		});
+	},
+
+	disconnectListener: function(reason) {
+		console.log(reason);
+		_this.showNews(reason);
+		_this.showError("掉线了 " + reason);
+		if (!_this.data.userForceDisconnect) {
+			console.log('掉线了');
+			_this.ask4Reconnect();
+			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+			app.globalData.disconnected = true;
+		}
+	},
+
+	heartBeatTimeoutListener: function () {
+		console.log('心跳超时');
+		_this.showError("心跳超时");
+		// _this.ask4Reconnect();
+		// //置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+		// app.globalData.disconnected = true;
 	},
 
 	getReady: function () {
