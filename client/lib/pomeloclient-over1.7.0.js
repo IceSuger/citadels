@@ -1069,34 +1069,34 @@
     }
     // dict = data.sys.dict;
     // var protos = data.sys.protos;
-    //
+    
     // //Init compress dict
     // if(dict) {
-    //   dict = dict;
-    //   abbrs = {};
-    //
-    //   for(var route in dict) {
-    //     abbrs[dict[route]] = route;
-    //   }
+      // dict = dict;
+      // abbrs = {};
+    
+      // for(var route in dict) {
+        // abbrs[dict[route]] = route;
+      // }
     // }
-    //
+    
     // //Init protobuf protos
     // if(protos) {
-    //   protoVersion = protos.version || 0;
-    //   serverProtos = protos.server || {};
-    //   clientProtos = protos.client || {};
-    //
-    //     //Save protobuf protos to localStorage
-    //     window.localStorage.setItem('protos', JSON.stringify(protos));
-    //
-    //     if(!!protobuf) {
-    //       protobuf.init({encoderProtos: protos.client, decoderProtos: protos.server});
-    //     }
-    //     if(!!decodeIO_protobuf) {
-    //       decodeIO_encoder = decodeIO_protobuf.loadJson(clientProtos);
-    //       decodeIO_decoder = decodeIO_protobuf.loadJson(serverProtos);
-    //     }
-    //   }
+      // protoVersion = protos.version || 0;
+      // serverProtos = protos.server || {};
+      // clientProtos = protos.client || {};
+    
+        // //Save protobuf protos to localStorage
+        // window.localStorage.setItem('protos', JSON.stringify(protos));
+    
+        // if(!!protobuf) {
+          // protobuf.init({encoderProtos: protos.client, decoderProtos: protos.server});
+        // }
+        // if(!!decodeIO_protobuf) {
+          // decodeIO_encoder = decodeIO_protobuf.loadJson(clientProtos);
+          // decodeIO_decoder = decodeIO_protobuf.loadJson(serverProtos);
+        // }
+      // }
     };
 
     module.exports = pomelo;

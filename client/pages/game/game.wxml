@@ -26,12 +26,12 @@
 
             <view class="texts" style='display: inline-block'>
                 <view class="wxname_text">{{wxNickName}}</view>
-                <view class="role_text">{{roleName_zh}} 金币 {{coins}} 手牌 {{handCards.length}}</view>
+                <view class="role_text">{{attrsInGame.roleName_zh}} 金币 {{attrsInGame.coins}} 手牌 {{attrsInGame.handCards.length}}</view>
             </view>
         </view>
         <view class="building_list south_part">
 
-            <template wx:for="{{buildingList}}" is="capsule_xiao" data="{{...item, staticBuildingDict}}" class="capsule_xiao" />
+            <template wx:for="{{attrsInGame.buildingList}}" is="capsule_xiao" data="{{...item, staticBuildingDict}}" class="capsule_xiao" />
 
         </view>
 

@@ -166,8 +166,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		pomelo.removeAllListeners();
 		//先注册监听房间成员变化的事件
 		pomelo.on('roomMemberChange', function (msg) {
-			// console.log('roomMemberChange' + msg);
-			_this.updatePlayers(msg.playerDict);
+			console.log('roomMemberChange' + msg);
+			_this.updatePlayers(msg.playerInfoDict);
 			// _this.showError('更新标题！');
 			wx.setNavigationBarTitle({
 				title: `房间 ${app.globalData.roomId} (${_this.data.roomMemberCnt}/${_this.data.roomMemberMax})`,
@@ -193,8 +193,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		// 监听选完角色后的行动消息
 		pomelo.on('onTakingAction', _this.onTakingAction);
 		pomelo.on('onSituationUpdate', function (msg) {
-			// console.log('roomMemberChange' + msg);
-			_this.updatePlayers(msg.playerDict);
+			_this.updateSituation(msg.playerVarArray);
 		});
 
 		pomelo.on('onMove', _this.showCurMove);
@@ -216,9 +215,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			 */
 			var cemeteryOwnerName, cemeteryOwnerSeatId;
 			_this.data.playerList.forEach((playerObj) => {
-				if (playerObj.buildingDict.hasOwnProperty(consts.BUILDINGS.CEMETERY)) {
+				if (playerObj.attrsInGame.buildingDict.hasOwnProperty(consts.BUILDINGS.CEMETERY)) {
 					cemeteryOwnerName = playerObj.wxNickName;
-					cemeteryOwnerSeatId = playerObj.seatId;
+					cemeteryOwnerSeatId = playerObj.attrsInGame.seatId;
 				}
 			})
 			if (cemeteryOwnerSeatId === _this.data.mySeatNum) {
@@ -253,7 +252,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			}
 		});
 		//监听刺客刺杀了谁，主要用于盗贼行动可行性的判断
-		pomelo.on('onRoleKilled', (msg)=>{
+		pomelo.on('onRoleKilled', (msg) => {
 			_this.setData({
 				roleIdKilled: msg.roleIdKilled
 			})
@@ -269,7 +268,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				logs: logs
 			})
 		});
-		
+
 		//监听重连后单点收到的消息（本局游戏历史和当前局势）
 		pomelo.on('onReconnect', function (msg) {
 			_this.showNews('重连了！!！');
@@ -277,7 +276,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				// logs: msg.logs,
 				gameOn: true
 			})
-			_this.updatePlayers(msg.playerDict);
+
+			_this.updatePlayers(msg.playerInfoDict);
+			_this.updateSituation(msg.playerVarArray);
 		})
 	},
 
@@ -304,13 +305,13 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 						userForceDisconnect: true
 					})
 					app.globalData.disconnected = false;
-					if(!_this.data.gameOn){
+					if (!_this.data.gameOn) {
 						//若游戏没在进行中，就退出本页面
 						wx.navigateBack({
 
 						})
 					}
-					
+
 				}
 			}
 		});
@@ -407,7 +408,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		var curPlayerName = curPlayerObj.wxNickName;
 		if (msg.move === consts.MOVE.TAKE_BUILDING_CARDS) {
 			// _this.showError(curPlayerName + ' 正在拿取建筑牌...');
-			_this.showNews(`请等待  ${curPlayerObj.roleName_zh}（${curPlayerName}）拿取建筑牌...`);
+			_this.showNews(`请等待  ${curPlayerObj.attrsInGame.roleName_zh}（${curPlayerName}）拿取建筑牌...`);
 		}
 	},
 
@@ -477,49 +478,18 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 	},
 
-	updatePlayers(playerDict) {
+	updatePlayers(playerInfoDict) {
 		var _this = this;
 
 		//把收到的dict转为本地的list
-		var playerList = [];
-		console.log('playerDict!!');
-		console.log(playerDict);
-		for (let uid in playerDict) {
-			var playerObj = playerDict[uid];
-			playerObj['buildingList'] = [];
-			for (let building in playerObj['buildingDict']) {
-				// console.log(building);
-				playerObj['buildingList'].push(_this.data.staticBuildingDict[building]);
-			}
+		var playerList = _this.data.playerList;
+		console.log('playerInfoDict!!');
+		console.log(playerInfoDict);
+		for (let uid in playerInfoDict) {
+			var playerObj = playerInfoDict[uid];
+			
 			//增加一些用于本地显示的属性
 			playerObj.ready = false;
-			// playerObj.roleName_zh = _this.data.roles[Number(playerObj.role)].name_zh;
-			if (playerObj.seatId !== null) {
-				try {
-					playerObj.isRoleKnown = _this.data.playerList[playerObj.seatId].isRoleKnown;
-				} catch (e) {
-					//失败说明游戏刚开始，这是第一轮操作。那身份就必然都还是未知。这里啥也不用做。捕获这个异常就行了。
-				}
-			}
-			if (playerObj.isRoleKnown) {
-				playerObj.roleName_zh = _this.data.roles[Number(playerObj.role)].name_zh;
-			} else {
-				playerObj.roleName_zh = _this.data.roles[0].name_zh;
-			}
-
-			// //如果该角色被杀了，则赋值 roleIdKilled
-			// if(_this.data.roles[playerObj.role].killed){
-			// 	_this.setData({
-			// 		roleIdKilled: playerObj.role
-			// 	})
-			// }
-
-			// //把已建造的（建筑牌id）映射成建筑牌对象
-			// var handCardObjs = [];
-			// playerObj.handCards.forEach(function (cardId, _, __) {
-			// 	handCardObjs.push(_this.data.staticBuildingDict[v_card]);
-			// })
-			// playerObj.handCardObjs = handCardObjs;
 
 			//判断游戏是否已经开局，因为开局后才会分配seatId
 			if (playerObj.seatId !== null) {
@@ -529,28 +499,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			}
 		}
 
-
-		// //遍历 knownRolePlayers，亮出相应玩家的身份
-		// //这里不需要判断是否已开局，因为没开局时，该list为空
-		// var knownRolePlayers = _this.data.knownRolePlayers;
-		// knownRolePlayers.forEach(function (seatId, _, __) {
-		// 	playerList[seatId].roleName_zh = _this.data.roles[Number(playerList[seatId].role)].name_zh;
-		// })
-		// 	// playerObj.roleName_zh = _this.data.roles[Number(playerObj.role)].name_zh;
-
-		//把我的手牌（建筑牌id）映射成建筑牌对象
-		var handCardObjs = [];
-		playerDict[app.globalData.uid].handCards.forEach(function (cardId, _, __) {
-			handCardObjs.push(_this.data.staticBuildingDict[cardId]);
-		})
-
 		if (!_this.data.mySeatNum) {
 			var mySeatNum = null;
 			playerList.forEach(function (value, index, _) {
-				// console.log('value.uid:');
-				// console.log(value.uid);
-				// console.log('app.globalData.uid:');
-				// console.log(app.globalData.uid);
 				if (value.uid === app.globalData.uid) {
 					//这是我。
 					mySeatNum = index;
@@ -563,10 +514,65 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 		_this.setData({
 			playerList: playerList,
-			roomMemberCnt: playerList.length,
-			handCards: handCardObjs
+			roomMemberCnt: playerList.length
 		})
 		console.log('playerList!');
+		console.log(playerList);
+	},
+
+	updateSituation: function (playerVarArray) {
+		var _this = this;
+		/**
+		 * 遍历收到的list，更新现有list里相应seatId的对象
+		 */
+
+		//现有list
+		var playerList = _this.data.playerList;
+		playerVarArray.forEach((playerVarObj, index) => {
+			// var seatId = playerVarObj.seatId;
+			playerVarObj['buildingList'] = [];
+			for (let building in playerVarObj['buildingDict']) {
+				// console.log(building);
+				playerVarObj['buildingList'].push(_this.data.staticBuildingDict[building]);
+			}
+			//增加一些用于本地显示的属性
+			// playerVarObj.ready = false;
+			if (playerVarObj.seatId !== null) {
+				try {
+					playerVarObj.isRoleKnown = _this.data.playerList[playerVarObj.seatId].isRoleKnown;
+				} catch (e) {
+					//失败说明游戏刚开始，这是第一轮操作。那身份就必然都还是未知。这里啥也不用做。捕获这个异常就行了。
+				}
+			}
+			if (playerVarObj.isRoleKnown) {
+				playerVarObj.roleName_zh = _this.data.roles[Number(playerVarObj.role)].name_zh;
+			} else {
+				playerVarObj.roleName_zh = _this.data.roles[0].name_zh;
+			}
+
+			// //判断游戏是否已经开局，因为开局后才会分配seatId
+			// if (playerVarObj.seatId !== null) {
+			playerList[playerVarObj.seatId].attrsInGame = playerVarObj;
+
+			//如果当前更新的player有我！
+			if (playerVarObj.seatId === _this.data.mySeatNum) {
+				//把我的手牌（建筑牌id）映射成建筑牌对象
+				var handCardObjs = [];
+				playerVarObj.handCards.forEach(function (cardId, _, __) {
+					handCardObjs.push(_this.data.staticBuildingDict[cardId]);
+				})
+				_this.setData({
+					handCards: handCardObjs
+				})
+			}
+
+		})
+
+
+		_this.setData({
+			playerList: playerList
+		})
+		console.log('situation updated.');
 		console.log(playerList);
 	},
 
@@ -651,7 +657,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		});
 	},
 
-	disconnectListener: function(reason) {
+	disconnectListener: function (reason) {
+		var _this = this;
 		console.log(reason);
 		_this.showNews(reason);
 		_this.showError("掉线了 " + reason);
@@ -664,11 +671,16 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	},
 
 	heartBeatTimeoutListener: function () {
+		var _this = this;
 		console.log('心跳超时');
 		_this.showError("心跳超时");
-		// _this.ask4Reconnect();
-		// //置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
-		// app.globalData.disconnected = true;
+
+		if (!_this.data.userForceDisconnect) {
+			console.log('掉线了');
+			_this.ask4Reconnect();
+			//置disconnected = true；用于在每次加载页面时，判断是否弹窗问要不要重连
+			app.globalData.disconnected = true;
+		}
 	},
 
 	getReady: function () {
@@ -834,7 +846,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				canTakeTax = true;
 			}
 
-			var playerObj = _this.data.playerList[_this.data.mySeatNum];
+			var playerObj = _this.data.playerList[_this.data.mySeatNum].attrsInGame;
+			console.log(_this.data.mySeatNum);
+			
 			var iHaveSmithy = false;
 			if (playerObj.buildingDict.hasOwnProperty(consts.BUILDINGS.SMITHY)) {
 				iHaveSmithy = true;
@@ -881,7 +895,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		console.log(`curPlayer: ${curPlayer}, mySeat: ${_this.data.mySeatNum}`);
 		var curPlayerObj = _this.data.playerList[curPlayer];
 		var curPlayerName = curPlayerObj.wxNickName;
-		_this.showNews(`请等待  ${curPlayerObj.roleName_zh}（${curPlayerName}）行动...`);
+		_this.showNews(`请等待  ${curPlayerObj.attrsInGame.roleName_zh}（${curPlayerName}）行动...`);
 	},
 
 	takeCoinsOrCards: function (e) {
@@ -1018,7 +1032,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 */
 	buildChosenBuilding(e) {
 		var cardId = e.currentTarget.dataset.cardId;
-		var myPlayerObj = this.data.playerList[this.data.mySeatNum];
+		var myPlayerObj = this.data.playerList[this.data.mySeatNum].attrsInGame;
 		// console.log(myPlayerObj);
 
 		if (myPlayerObj.coins < this.data.staticBuildingDict[cardId].cost) {
