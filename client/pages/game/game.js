@@ -348,8 +348,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		//清空上一轮显示的所有角色名
 		this.data.playerList.forEach((_, index, __) => {
 			this.setData({
-				[`playerList[${index}].isRoleKnown`]: false,
-				[`playerList[${index}].roleName_zh`]: this.data.roles[0].name_zh
+				[`playerList[${index}].attrsInGame.isRoleKnown`]: false,
+				[`playerList[${index}].attrsInGame.roleName_zh`]: this.data.roles[0].name_zh
 			})
 		})
 		//重置move页
@@ -482,7 +482,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		var _this = this;
 
 		//把收到的dict转为本地的list
-		var playerList = _this.data.playerList;
+		// var playerList = _this.data.playerList;
+		var playerList = [];
 		console.log('playerInfoDict!!');
 		console.log(playerInfoDict);
 		for (let uid in playerInfoDict) {
@@ -539,7 +540,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			// playerVarObj.ready = false;
 			if (playerVarObj.seatId !== null) {
 				try {
-					playerVarObj.isRoleKnown = _this.data.playerList[playerVarObj.seatId].isRoleKnown;
+					playerVarObj.isRoleKnown = _this.data.playerList[playerVarObj.seatId].attrsInGame.isRoleKnown;
 				} catch (e) {
 					//失败说明游戏刚开始，这是第一轮操作。那身份就必然都还是未知。这里啥也不用做。捕获这个异常就行了。
 				}
@@ -820,8 +821,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		// }
 		if (curPlayer !== _this.data.curPlayer) {
 			_this.setData({
-				[`playerList[${Number(curPlayer)}].isRoleKnown`]: true,
-				[`playerList[${Number(curPlayer)}].roleName_zh`]: _this.data.roles[Number(msg.roleId)].name_zh
+				[`playerList[${Number(curPlayer)}].attrsInGame.isRoleKnown`]: true,
+				[`playerList[${Number(curPlayer)}].attrsInGame.roleName_zh`]: _this.data.roles[Number(msg.roleId)].name_zh
 			})
 		}
 
@@ -848,7 +849,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 			var playerObj = _this.data.playerList[_this.data.mySeatNum].attrsInGame;
 			console.log(_this.data.mySeatNum);
-			
+
 			var iHaveSmithy = false;
 			if (playerObj.buildingDict.hasOwnProperty(consts.BUILDINGS.SMITHY)) {
 				iHaveSmithy = true;
@@ -1163,7 +1164,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			// var buildingList4Picking2Demolish = targetPlayer.buildingList;
 			_this.setData({
 				pickingBuilding2demolish: true,
-				buildingList4Picking2Demolish: targetPlayer.buildingList,
+				buildingList4Picking2Demolish: targetPlayer.attrsInGame.buildingList,
 				targetPlayerSeatId: targetPlayerSeatId
 			})
 			//切到行动页
@@ -1242,7 +1243,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 		var cardId = e.currentTarget.dataset.cardId;
 		console.log(e);
 
-		var targetPlayer = this.data.playerList[this.data.targetPlayerSeatId];
+		var targetPlayer = this.data.playerList[this.data.targetPlayerSeatId].attrsInGame;
 		// var buildingList = targetPlayer.buildingList;
 		var targetBuilding = this.data.staticBuildingDict[cardId];
 		console.log(targetBuilding);
@@ -1257,7 +1258,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			if (targetPlayer.hasGreatWall) {
 				cost2Demolish += 1;
 			}
-			if (_this.data.playerList[_this.data.mySeatNum].coins >= cost2Demolish) {
+			if (_this.data.playerList[_this.data.mySeatNum].attrsInGame.coins >= cost2Demolish) {
 				//可以拆除，通知服务器
 				var msg = {
 					targetSeatId: this.data.targetPlayerSeatId,
@@ -1411,7 +1412,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 * 判断是否有足够的金币。
 	 */
 	smithy() {
-		if (this.data.playerList[this.data.mySeatNum].coins >= 2) {
+		if (this.data.playerList[this.data.mySeatNum].attrsInGame.coins >= 2) {
 			//若金币够用
 			pomelo.request("core.coreHandler.smithy", {}, null);
 		} else {
@@ -1506,7 +1507,7 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 * 判断我的金币够不够1个
 	 */
 	recycle() {
-		if (this.data.playerList[this.data.mySeatNum].coins >= 1) {
+		if (this.data.playerList[this.data.mySeatNum].attrsInGame.coins >= 1) {
 			pomelo.request("core.coreHandler.recycle", {
 				recycle: true,
 				cardId: cemeteryCard.id
