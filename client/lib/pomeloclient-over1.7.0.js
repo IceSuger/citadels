@@ -644,9 +644,10 @@
     };
   }
 
-  var root = getApp();
+  // var root = getApp();
   var pomelo = Object.create(EventEmitter.prototype); // object extend from object
-  root.pomelo = pomelo;
+  // root.pomelo = pomelo;
+  
   // 微信基础库1.7.0以后，支持存在多个websocket，
   // 每个都是通过wx.connectSocket返回的SocketTask实例，
   // 这里的socket即是一个SocketTask

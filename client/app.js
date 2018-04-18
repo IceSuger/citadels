@@ -53,5 +53,5 @@ App({
 
   },
   //全局pomelo单例
-  pomelo: null
+  pomelo: require('lib/pomeloclient-over1.7.0')
 })

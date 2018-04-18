@@ -1,11 +1,12 @@
 //index.js
 var Zan = require('../../zanui/index');
-var pomelo = require('../../lib/pomeloclient-over1.7.0');
+
 const consts = require('../../utils/consts');
 const config = require('./config');
 const MD5 = require('../../utils/md5.js')
 //获取应用实例
 const app = getApp()
+var pomelo = app.pomelo;
 
 Page(Object.assign({}, Zan.TopTips, Zan.Field, {
 	data: {

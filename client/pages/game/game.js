@@ -3,6 +3,7 @@ var Zan = require('../../zanui/index');
 const roleConfig = require('./roleConfig');
 const consts = require('../../utils/consts');
 const buildings = require('../../utils/buildings');
+const MD5 = require('../../utils/md5.js')
 const app = getApp();
 var pomelo = app.pomelo;
 
@@ -12,6 +13,8 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 * 页面的初始数据
 	 */
 	data: {
+		hasUserInfo: false,
+		canIUse: wx.canIUse('button.open-type.getUserInfo'),
 		testBool: false,
 		gameOver: false,
 		consts: consts,
@@ -144,21 +147,65 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	 * 生命周期函数--监听页面加载
 	 */
 	onLoad: function (options) {
-		var _this = this;
-		console.log(options);
-		this.initStaticBuildingDict();
-		this.initRoleNamesList();
 		this.setData({
-			roomId: options.roomId,
-			logs: ['开始！']
+			loadOptions: options
 		})
-		// wx.setNavigationBarTitle({
-		// 	title: '房间 ' + options.roomId,
+		// var _this = this;
+		// console.log(options);
+		// this.initStaticBuildingDict();
+		// this.initRoleNamesList();
+		// this.setData({
+		// 	roomId: options.roomId,
+		// 	logs: ['开始！']
 		// })
+		// // wx.setNavigationBarTitle({
+		// // 	title: '房间 ' + options.roomId,
+		// // })
 
+		// if (app.globalData.userInfo) {
+		// 	this.setData({
+		// 		userInfo: app.globalData.userInfo,
+		// 		hasUserInfo: true
+		// 	})
+		// 	//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+		// 	app.globalData.uid = MD5.md5(app.globalData.userInfo);
+		// 	console.log(app.globalData.userInfo);
+		// 	console.log(app.globalData.uid);
+		// 	this.enterRoom(options);
+		// } else if (this.data.canIUse) {
+		// 	// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+		// 	// 所以此处加入 callback 以防止这种情况
+		// 	app.userInfoReadyCallback = res => {
+		// 		this.setData({
+		// 			userInfo: res.userInfo,
+		// 			hasUserInfo: true
+		// 		})
+		// 		//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+		// 		app.globalData.uid = MD5.md5(app.globalData.userInfo);
+		// 		console.log(app.globalData.userInfo);
+		// 		console.log(app.globalData.uid);
+		// 		this.enterRoom(options);
+		// 	}
+		// } else {
+		// 	// 在没有 open-type=getUserInfo 版本的兼容处理
+		// 	wx.getUserInfo({
+		// 		success: res => {
+		// 			app.globalData.userInfo = res.userInfo
+		// 			this.setData({
+		// 				userInfo: res.userInfo,
+		// 				hasUserInfo: true
+		// 			})
+		// 			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+		// 			app.globalData.uid = MD5.md5(app.globalData.userInfo);
+		// 			console.log(app.globalData.userInfo);
+		// 			console.log(app.globalData.uid);
+		// 			this.enterRoom(options);
+		// 		}
+		// 	})
 
+		// }
 
-		this.enterRoom(options);
+		
 	},
 
 	pomeloAddListeners() {
@@ -433,17 +480,75 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 	onShow: function () {
 		// 滚动通告栏需要initScroll
 		this.initZanNoticeBarScroll('noticeBar');
-		// //判断是否已断线，若是，则询问是否重连
-		// if (app.globalData.disconnected === true) {
-		// 	this.ask4Reconnect();
-		// }
+		
+		var options = this.data.loadOptions;
+		//下面这些，原来在onLoad里
+		var _this = this;
+		console.log(options);
+		this.initStaticBuildingDict();
+		this.initRoleNamesList();
+		this.setData({
+			roomId: options.roomId,
+			logs: ['开始！']
+		})
+		// wx.setNavigationBarTitle({
+		// 	title: '房间 ' + options.roomId,
+		// })
+
+		if (app.globalData.userInfo) {
+			this.setData({
+				userInfo: app.globalData.userInfo,
+				hasUserInfo: true
+			})
+			//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+			app.globalData.uid = MD5.md5(app.globalData.userInfo);
+			console.log(app.globalData.userInfo);
+			console.log(app.globalData.uid);
+			this.enterRoom(options);
+		} else if (this.data.canIUse) {
+			// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+			// 所以此处加入 callback 以防止这种情况
+			app.userInfoReadyCallback = res => {
+				this.setData({
+					userInfo: res.userInfo,
+					hasUserInfo: true
+				})
+				//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+				app.globalData.uid = MD5.md5(app.globalData.userInfo);
+				console.log(app.globalData.userInfo);
+				console.log(app.globalData.uid);
+				this.enterRoom(options);
+			}
+		} else {
+			// 在没有 open-type=getUserInfo 版本的兼容处理
+			wx.getUserInfo({
+				success: res => {
+					app.globalData.userInfo = res.userInfo
+					this.setData({
+						userInfo: res.userInfo,
+						hasUserInfo: true
+					})
+					//对userInfo对象（不包含用户敏感信息如openId）做md5得到发给pomelo端的用户uid
+					app.globalData.uid = MD5.md5(app.globalData.userInfo);
+					console.log(app.globalData.userInfo);
+					console.log(app.globalData.uid);
+					this.enterRoom(options);
+				}
+			})
+
+		}
+
 	},
 
 	/**
 	 * 生命周期函数--监听页面隐藏
 	 */
 	onHide: function () {
-
+		//打标记：这是用户主动断开的连接
+		this.setData({
+			userForceDisconnect: true
+		})
+		pomelo.disconnect();
 	},
 
 	/**
@@ -495,16 +600,20 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			//判断游戏是否已经开局，因为开局后才会分配seatId
 			if (playerObj.seatId !== null) {
 				playerList[playerObj.seatId] = playerObj;
+				console.log('已开局，playerList 按位置填入了一个元素');
 			} else {
 				playerList.push(playerObj);
+				console.log('playerList push 了一个元素');
 			}
 		}
 
 		if (!_this.data.mySeatNum) {
 			var mySeatNum = null;
+			console.log('mySeatNum is still null ');
 			playerList.forEach(function (value, index, _) {
 				if (value.uid === app.globalData.uid) {
 					//这是我。
+					console.log('我的seat: '+index);
 					mySeatNum = index;
 				}
 			})
@@ -512,13 +621,20 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 				mySeatNum: mySeatNum
 			})
 		}
+		console.log('set不了data？？？');
 
-		_this.setData({
-			playerList: playerList,
-			roomMemberCnt: playerList.length
+		// this.setData({
+		// 	[`playerList`]: playerList,
+		// 	roomMemberCnt: playerList.length
+		// })
+		this.data.playerList = playerList;
+		this.setData({
+			[`playerList`]: this.data.playerList,
+			roomMemberCnt: this.data.playerList.length
 		})
 		console.log('playerList!');
 		console.log(playerList);
+		
 	},
 
 	updateSituation: function (playerVarArray) {
@@ -590,6 +706,13 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 			_this.pomeloAddListeners();
 		}
 
+		//先断开现有连接
+		//打标记：这是用户主动断开的连接
+		this.setData({
+			userForceDisconnect: true
+		})
+		pomelo.disconnect();
+
 		pomelo.init({
 			host: app.globalData.conn_host,	//connector的host和port
 			port: app.globalData.conn_port,
@@ -660,9 +783,9 @@ Page(Object.assign({}, Zan.TopTips, Zan.Tab, Zan.CheckLabel, Zan.Dialog, Zan.Not
 
 	disconnectListener: function (reason) {
 		var _this = this;
-		console.log(reason);
-		_this.showNews(reason);
-		_this.showError("掉线了 " + reason);
+		// console.log(reason);
+		// _this.showNews(reason);
+		// _this.showError("掉线了 " + reason);
 		if (!_this.data.userForceDisconnect) {
 			console.log('掉线了');
 			_this.ask4Reconnect();
